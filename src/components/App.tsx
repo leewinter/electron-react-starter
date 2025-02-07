@@ -4,6 +4,40 @@ import type { Navigation } from '@toolpad/core/AppProvider';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import StorageIcon from '@mui/icons-material/Storage';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+const customTheme = createTheme({
+  cssVariables: {
+    colorSchemeSelector: 'data-toolpad-color-scheme',
+  },
+  colorSchemes: {
+    light: {
+      palette: {
+        background: {
+          default: '#F9F9FE',
+          paper: '#EEEEF9',
+        },
+      },
+    },
+    dark: {
+      palette: {
+        background: {
+          default: '#2A4364',
+          paper: '#112E4D',
+        },
+      },
+    },
+  },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 600,
+      lg: 1200,
+      xl: 1536,
+    },
+  },
+});
 
 declare global {
   interface Window {
@@ -35,10 +69,11 @@ const BRANDING = {
 };
 
 function App() {
-  return (
-    <ReactRouterAppProvider navigation={NAVIGATION} branding={BRANDING}>
+  return (<ThemeProvider theme={customTheme}>
+    <ReactRouterAppProvider navigation={NAVIGATION} branding={BRANDING} theme={customTheme}>
       <Outlet />
     </ReactRouterAppProvider>
+  </ThemeProvider>
   );
 }
 
