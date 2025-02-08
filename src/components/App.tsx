@@ -1,6 +1,43 @@
-import { useEffect, useState } from "react";
-import { useEventChannel } from '../hooks/use-event-channel'
-import { type EventRequest, type EventResponse } from '../types/events'
+import { type EventResponse } from '../types/events'
+import { Outlet } from 'react-router';
+import type { Navigation } from '@toolpad/core/AppProvider';
+import { ReactRouterAppProvider } from '@toolpad/core/react-router';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import StorageIcon from '@mui/icons-material/Storage';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+const customTheme = createTheme({
+  cssVariables: {
+    colorSchemeSelector: 'data-toolpad-color-scheme',
+  },
+  colorSchemes: {
+    light: {
+      palette: {
+        background: {
+          default: '#F9F9FE',
+          paper: '#EEEEF9',
+        },
+      },
+    },
+    dark: {
+      palette: {
+        background: {
+          default: '#2A4364',
+          paper: '#112E4D',
+        },
+      },
+    },
+  },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 600,
+      lg: 1200,
+      xl: 1536,
+    },
+  },
+});
 
 declare global {
   interface Window {
@@ -11,28 +48,32 @@ declare global {
   }
 }
 
-const CHANNEL = 'hello';
+const NAVIGATION: Navigation = [
+  {
+    kind: 'header',
+    title: 'Main items',
+  },
+  {
+    title: 'Dashboard',
+    icon: <DashboardIcon />,
+  },
+  {
+    segment: 'sql',
+    title: 'SQL',
+    icon: <StorageIcon />,
+  },
+];
+
+const BRANDING = {
+  title: 'Electron React Starter',
+};
 
 function App() {
-  const [message, setMessage] = useState("");
-  const { sendMessage, onMessage } = useEventChannel({ channel: CHANNEL })
-
-  useEffect(() => {
-    // Send message to Electron
-    onMessage((data: EventResponse) => {
-      setMessage(data.payload.message);
-    });
-
-  }, []);
-
-  return (
-    <div>
-      <h1>React & Electron IPC</h1>
-      <p>Message from Electron: {message}</p>
-      <button onClick={() => {
-        sendMessage({ channel: CHANNEL, payload: { message: "Hello Electron" } } as EventRequest);
-      }}>Send Message</button>
-    </div>
+  return (<ThemeProvider theme={customTheme}>
+    <ReactRouterAppProvider navigation={NAVIGATION} branding={BRANDING} theme={customTheme}>
+      <Outlet />
+    </ReactRouterAppProvider>
+  </ThemeProvider>
   );
 }
 
