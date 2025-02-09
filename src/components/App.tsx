@@ -11,19 +11,19 @@ const customTheme = createTheme({
     colorSchemeSelector: 'data-toolpad-color-scheme',
   },
   colorSchemes: {
-    light: {
-      palette: {
-        background: {
-          default: '#F9F9FE',
-          paper: '#EEEEF9',
-        },
-      },
-    },
     dark: {
       palette: {
         background: {
           default: '#2A4364',
           paper: '#112E4D',
+        },
+      },
+    },
+    light: {
+      palette: {
+        background: {
+          default: '#F9F9FE',
+          paper: '#EEEEF9',
         },
       },
     },
@@ -69,7 +69,8 @@ const BRANDING = {
 };
 
 function App() {
-  return (<ThemeProvider theme={customTheme}>
+
+  return (<ThemeProvider theme={customTheme} defaultMode="dark">
     <ReactRouterAppProvider navigation={NAVIGATION} branding={BRANDING} theme={customTheme}>
       <Outlet />
     </ReactRouterAppProvider>

@@ -4,5 +4,6 @@ export enum DataChannel {
 
 export enum DataChannelMethod {
   GET = "GET",
-  POST = "POST"
+  POST = "POST",
+  DELETE = "DELETE"
 }
