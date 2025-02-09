@@ -9,3 +9,9 @@ export type EventResponse = {
   payload: any,
   method: string
 }
+
+export type SqlConnection = {
+  connectionId: string,
+  connectionName: string,
+  connectionString: string
+}
