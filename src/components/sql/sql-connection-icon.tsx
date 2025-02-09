@@ -3,10 +3,8 @@ import { IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button }
 import StorageIcon from "@mui/icons-material/Storage";
 import SqlConnectionForm from './sql-connection-form'
 import SqlConnectionTable from './sql-connection-grid'
-import { useEventChannel } from '../../hooks/use-event-channel';
-import { DataChannel, DataChannelMethod } from '../../electron/data-channels';
-import { type EventRequest, type EventResponse, type SqlConnection } from '../../types/events';
-
+import { type SqlConnection } from '../../types/events';
+import { useSqlConnections } from './hooks/use-sql-connections'
 
 
 const SqlConnectionIcon: React.FC = () => {
@@ -14,36 +12,32 @@ const SqlConnectionIcon: React.FC = () => {
   const [connectionToEdit, setConnectionToEdit] = useState<SqlConnection>();
   const [open, setOpen] = useState(false);
 
-  const { sendMessage, onMessage } = useEventChannel({ channel: DataChannel.SQL_CONNECTIONS })
+  const { getItem, setItem } = useSqlConnections();
 
   useEffect(() => {
-    onMessage((data: EventResponse) => {
-      setConnections(data.payload.connections);
-    });
-    sendMessage({
-      channel: DataChannel.SQL_CONNECTIONS,
-      payload: {},
-      method: DataChannelMethod.GET
-    } as EventRequest);
+    const dataLoad = async () => {
+      const results = await getItem();
+      setConnections(results || [])
+    };
+    dataLoad();
   }, [])
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleSaveConnection = (connection: SqlConnection) => {
-    sendMessage({
-      channel: DataChannel.SQL_CONNECTIONS,
-      payload: connection,
-      method: DataChannelMethod.POST
-    } as EventRequest);
+    const updatedConnections = connections.map(n => n.connectionId === connection.connectionId ? connection : n);
+    if (!updatedConnections.some(n => n.connectionId === connection.connectionId)) updatedConnections.push(connection)
+
+    setItem(updatedConnections);
+    setConnections(updatedConnections);
   }
 
   const handleDeleteConnection = (connection: SqlConnection) => {
-    sendMessage({
-      channel: DataChannel.SQL_CONNECTIONS,
-      payload: connection,
-      method: DataChannelMethod.DELETE
-    } as EventRequest);
+    const updatedConnections = connections.filter(n => n.connectionId !== connection.connectionId);
+
+    setItem(updatedConnections);
+    setConnections(updatedConnections);
   }
 
   return (
