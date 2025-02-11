@@ -65,9 +65,30 @@ const eventsArray = [
           const sqlConfig = parseSqlConnectionString(args.payload.selectedConnection.connectionString);
 
           await mssql.connect(sqlConfig);
-          const result = await mssql.query`${args.payload.sql}`;
+          const request = new mssql.Request()
+          request.arrayRowMode = true
+
+          const result = await request.query(args.payload.sql);
+
+          const recordset = result.recordset ?? [];
+
+          const columns =
+            Array.isArray(result?.columns) && Array.isArray(result.columns[0])
+              ? result.columns[0].map((col) => {
+                  return {
+                    name: col.name,
+                    type: col.type.name,
+                    length: col.length,
+                    nullable: col.nullable,
+                    precision: col.precision,
+                    scale: col.scale,
+                  };
+                })
+              : [];
+
+          
           console.dir(result)
-          const generatedResponsePayload = { channel: this.channel, payload: {  sqlConfig } } as EventResponse;
+          const generatedResponsePayload = { channel: this.channel, payload: { recordset, columns } } as EventResponse;
 
           event.reply(`${this.channel}-response`, generatedResponsePayload);
         } catch (error) {
