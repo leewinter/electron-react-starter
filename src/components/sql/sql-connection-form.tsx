@@ -70,7 +70,7 @@ const SqlConnectionDialog: React.FC<SqlConnectionDialogProps> = ({ open, initial
             helperText={errors.connectionString}
             fullWidth
             multiline
-            rows={2}
+            rows={5}
           />
         </Box>
       </DialogContent>

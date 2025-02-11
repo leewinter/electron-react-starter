@@ -16,6 +16,12 @@ export const useEventChannel = ({ channel }: { channel: string }) => {
           if (response) response(data);
         });
       }
+    },
+    removeListener: function () {
+      if (channel) {
+        // Remove listener
+        window.electron.removeListener(`${channel}-response`);
+      }
     }
   };
 }

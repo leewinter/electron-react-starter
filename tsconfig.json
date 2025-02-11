@@ -1,16 +1,17 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "commonjs",
+    "module": "NodeNext",
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "noImplicitAny": true,
     "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "rootDir": ".",
     "outDir": "./publish",
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
     "jsx": "react-jsx"
   }

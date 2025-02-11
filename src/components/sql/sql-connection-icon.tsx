@@ -50,9 +50,10 @@ const SqlConnectionIcon: React.FC = () => {
       {/* Modal/Dialog */}
       <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth>
         <DialogTitle>SQL Connections</DialogTitle>
-        <DialogContent dividers><SqlConnectionTable data={connections} onEdit={(row) => setConnectionToEdit(row)} onDelete={(row) => handleDeleteConnection(row)} onAdd={(row) => {
-          setConnectionToEdit(row)
-        }} />
+        <DialogContent dividers>
+          <SqlConnectionTable data={connections} onEdit={(row) => setConnectionToEdit(row)} onDelete={(row) => handleDeleteConnection(row)} onAdd={(row) => {
+            setConnectionToEdit(row)
+          }} />
           <SqlConnectionForm initialData={connectionToEdit}
             onSubmit={(val) => handleSaveConnection(val)}
             open={Boolean(connectionToEdit)}
