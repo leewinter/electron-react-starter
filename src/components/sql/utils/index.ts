@@ -3,7 +3,7 @@ export const parseSqlConnectionString = (connectionString: string) => {
 
   // Split key-value pairs
   const pairs = connectionString.split(';');
-  
+
   pairs.forEach(pair => {
     const [key, value] = pair.split('=').map(part => part.trim());
 
@@ -28,13 +28,19 @@ export const parseSqlConnectionString = (connectionString: string) => {
         config.password = value;
         break;
       case 'trustservercertificate':
-        config.options = { ...(config.options || {}), trustServerCertificate: value.toLowerCase() === 'true' };
+        config.options = {
+          ...(config.options || {}),
+          trustServerCertificate: value.toLowerCase() === 'true',
+        };
         break;
       case 'application name':
         config.options = { ...(config.options || {}), appName: value };
         break;
       case 'multipleactiveresultsets':
-        config.options = { ...(config.options || {}), multipleActiveResultSets: value.toLowerCase() === 'true' };
+        config.options = {
+          ...(config.options || {}),
+          multipleActiveResultSets: value.toLowerCase() === 'true',
+        };
         break;
     }
   });

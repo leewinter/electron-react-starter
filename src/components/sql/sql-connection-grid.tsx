@@ -1,11 +1,20 @@
-import React from "react";
+import React from 'react';
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  TableFooter, Paper, IconButton, Button, Box
-} from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add";
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableFooter,
+  Paper,
+  IconButton,
+  Button,
+  Box,
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 
 export type SqlConnection = {
   connectionId: string;
@@ -16,8 +25,8 @@ export type SqlConnection = {
 const getDefaultConnection = () => ({
   connectionId: crypto.randomUUID(),
   connectionName: '',
-  connectionString: ''
-})
+  connectionString: '',
+});
 
 type SqlConnectionTableProps = {
   data: SqlConnection[];
@@ -26,22 +35,40 @@ type SqlConnectionTableProps = {
   onAdd: (connection: SqlConnection) => void; // Function to handle adding a new connection
 };
 
-const SqlConnectionTable: React.FC<SqlConnectionTableProps> = ({ data, onEdit, onDelete, onAdd }) => {
+const SqlConnectionTable: React.FC<SqlConnectionTableProps> = ({
+  data,
+  onEdit,
+  onDelete,
+  onAdd,
+}) => {
   return (
     <TableContainer component={Paper}>
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell><b>Connection Name</b></TableCell>
-            <TableCell><b>Connection String</b></TableCell>
-            <TableCell align="right"><b>Actions</b></TableCell>
+            <TableCell>
+              <b>Connection Name</b>
+            </TableCell>
+            <TableCell>
+              <b>Connection String</b>
+            </TableCell>
+            <TableCell align="right">
+              <b>Actions</b>
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((connection) => (
+          {data.map(connection => (
             <TableRow key={connection.connectionId}>
               <TableCell>{connection.connectionName}</TableCell>
-              <TableCell sx={{ maxWidth: 300, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <TableCell
+                sx={{
+                  maxWidth: 300,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
                 {connection.connectionString}
               </TableCell>
               <TableCell align="right">
@@ -60,7 +87,12 @@ const SqlConnectionTable: React.FC<SqlConnectionTableProps> = ({ data, onEdit, o
           <TableRow>
             <TableCell colSpan={3}>
               <Box display="flex" justifyContent="flex-end" mt={2} mb={2} pr={2}>
-                <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => onAdd(getDefaultConnection())}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<AddIcon />}
+                  onClick={() => onAdd(getDefaultConnection())}
+                >
                   Add New
                 </Button>
               </Box>
