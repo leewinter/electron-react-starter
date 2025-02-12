@@ -4,7 +4,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   build: {
     rollupOptions: {
-      external: ['mssql','sql-formatter'], // Ensures `mssql` is externalized
+      external: ['mssql', 'sql-formatter'], // Ensures `mssql` is externalized
     },
   },
 });

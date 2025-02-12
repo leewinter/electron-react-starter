@@ -1,23 +1,38 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Button, Container, Grid2 } from '@mui/material';
-
-import SqlConnectionIcon from '../../sql/sql-connection-icon';
-import SqlCodeEditor from '../../sql/sql-code-editor';
-import SqlConnectionSelect from '../../sql/sql-connection-select';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Button,
+  Container,
+  Typography,
+} from '@mui/material';
 import { EventRequest, SqlConnection } from '../../../types/events';
-import { useSqlConnections } from '../../sql/hooks/use-sql-connections';
-import { useEventChannel } from '../../../hooks/use-event-channel'
+import { useCallback, useEffect, useState } from 'react';
+
 import { DataChannel } from '../../../electron/data-channels';
-import ReportGrid from '../../sql/sql-result-grid'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ReportGrid from '../../sql/sql-result-grid';
+import SqlCodeEditor from '../../sql/sql-code-editor';
+import SqlConnectionIcon from '../../sql/sql-connection-icon';
+import SqlConnectionSelect from '../../sql/sql-connection-select';
+import { Stack } from '@mui/material';
+import { useEventChannel } from '../../../hooks/use-event-channel';
+import { useSqlConnections } from '../../sql/hooks/use-sql-connections';
 
 export default function SqlPage() {
-  const [selectedConnection, setSelectedConnection] = useState<SqlConnection | undefined>(undefined);
+  const [selectedConnection, setSelectedConnection] = useState<SqlConnection | undefined>(
+    undefined
+  );
   const [connections, setConnections] = useState<Array<SqlConnection>>([]);
-  const [code, setCode] = useState<string>();
+  const [code, setCode] = useState<string>('');
   const [sqlResults, setSqlResults] = useState<any | undefined>(undefined);
-  const { getItem } = useSqlConnections();
+  const [isEditorExpanded, setIsEditorExpanded] = useState(true);
+  const [isResultsExpanded, setIsResultsExpanded] = useState(false);
 
-  const { sendMessage, onMessage, removeListener } = useEventChannel({ channel: DataChannel.SQL_EXECUTE })
+  const { getItem } = useSqlConnections();
+  const { sendMessage, onMessage, removeListener } = useEventChannel({
+    channel: DataChannel.SQL_EXECUTE,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,41 +44,59 @@ export default function SqlPage() {
 
   return (
     <Container sx={{ mt: 3 }}>
-      <Grid2 container spacing={2}>
+      {/* SQL Connection Select */}
+      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+        <SqlConnectionSelect
+          onChange={connectionId => {
+            const selectedConnectionOption = connections.find(c => c.connectionId === connectionId);
+            setSelectedConnection(selectedConnectionOption);
+          }}
+          selectedConnection={selectedConnection}
+        />
+        <SqlConnectionIcon />
+      </Stack>
 
-        <Grid2 size={10}>
-          <SqlConnectionSelect
-            onChange={(val) => {
-              const selectedConnectionOption = connections.find((c) => c.connectionId === val);
-              setSelectedConnection(selectedConnectionOption);
-            }}
-            selectedConnection={selectedConnection}
-          />
-        </Grid2>
-
-        <Grid2 size={2}>
-          <SqlConnectionIcon />
-        </Grid2>
-
-        <Grid2 size={12}>
+      {/* SQL Code Editor in an Accordion */}
+      <Accordion expanded={isEditorExpanded} onChange={() => setIsEditorExpanded(prev => !prev)}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography variant="h6">SQL Query Editor</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
           <SqlCodeEditor code={code} onChange={setCode} />
-        </Grid2>
+          <Button
+            variant="contained"
+            sx={{ mt: 2 }}
+            disabled={!selectedConnection || !code}
+            onClick={() => {
+              sendMessage({
+                channel: DataChannel.SQL_EXECUTE,
+                payload: { sql: code, selectedConnection },
+              } as EventRequest);
 
-        <Grid2 size={12}>
-          <Button disabled={!selectedConnection || !code} onClick={() => {
-            sendMessage({ channel: DataChannel.SQL_EXECUTE, payload: { sql: code, selectedConnection } } as EventRequest)
-            onMessage((response) => {
-              setSqlResults( response.payload)
-              removeListener();
-            });
-          }}>Execute</Button>
-        </Grid2>
+              onMessage(response => {
+                setSqlResults(response.payload);
+                removeListener();
 
-        <Grid2 size={12}>
+                // Minimize editor and expand results
+                setIsEditorExpanded(false);
+                setIsResultsExpanded(true);
+              });
+            }}
+          >
+            Execute
+          </Button>
+        </AccordionDetails>
+      </Accordion>
+
+      {/* SQL Result Grid in an Accordion */}
+      <Accordion expanded={isResultsExpanded} onChange={() => setIsResultsExpanded(prev => !prev)}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography variant="h6">Query Results</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
           <ReportGrid sqlResults={sqlResults} />
-        </Grid2>
-
-      </Grid2>
+        </AccordionDetails>
+      </Accordion>
     </Container>
   );
 }

@@ -1,7 +1,6 @@
-import { type EventRequest, type EventResponse } from '../types/events'
+import { type EventRequest, type EventResponse } from '../types/events';
 
 export const useEventChannel = ({ channel }: { channel: string }) => {
-
   return {
     sendMessage: function (msg: EventRequest) {
       if (channel) {
@@ -12,7 +11,7 @@ export const useEventChannel = ({ channel }: { channel: string }) => {
     onMessage: function (response: (data: EventResponse) => void) {
       if (channel && response) {
         // Listen for response from Electron
-        window.electron.onMessage(`${channel}-response`, (data) => {
+        window.electron.onMessage(`${channel}-response`, data => {
           if (response) response(data);
         });
       }
@@ -22,6 +21,6 @@ export const useEventChannel = ({ channel }: { channel: string }) => {
         // Remove listener
         window.electron.removeListener(`${channel}-response`);
       }
-    }
+    },
   };
-}
+};

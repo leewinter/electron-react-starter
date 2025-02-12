@@ -2,8 +2,6 @@ import localforage from 'localforage';
 import { SqlConnection } from '../sql-connection-grid';
 
 export const useSqlConnections = () => {
-
-
   return {
     getItem: async function () {
       try {
@@ -20,6 +18,6 @@ export const useSqlConnections = () => {
       } catch (err) {
         console.log(err);
       }
-    }
+    },
   };
-}
+};

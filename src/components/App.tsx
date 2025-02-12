@@ -1,4 +1,4 @@
-import { type EventResponse } from '../types/events'
+import { type EventResponse } from '../types/events';
 import { Outlet } from 'react-router';
 import type { Navigation } from '@toolpad/core/AppProvider';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
@@ -70,12 +70,12 @@ const BRANDING = {
 };
 
 function App() {
-
-  return (<ThemeProvider theme={customTheme} defaultMode="dark">
-    <ReactRouterAppProvider navigation={NAVIGATION} branding={BRANDING} theme={customTheme}>
-      <Outlet />
-    </ReactRouterAppProvider>
-  </ThemeProvider>
+  return (
+    <ThemeProvider theme={customTheme} defaultMode="dark">
+      <ReactRouterAppProvider navigation={NAVIGATION} branding={BRANDING} theme={customTheme}>
+        <Outlet />
+      </ReactRouterAppProvider>
+    </ThemeProvider>
   );
 }
 
