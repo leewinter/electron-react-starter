@@ -1,38 +1,38 @@
-import React from 'react';
 import {
+  Box,
+  Button,
+  IconButton,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
+  TableFooter,
   TableHead,
   TableRow,
-  TableFooter,
-  Paper,
-  IconButton,
-  Button,
-  Box,
 } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import HistoryIcon from '@mui/icons-material/History';
+import React from 'react';
+import { SqlConnection } from 'src/types/events';
 
-export type SqlConnection = {
-  connectionId: string;
-  connectionName: string;
-  connectionString: string;
-};
-
-const getDefaultConnection = () => ({
-  connectionId: crypto.randomUUID(),
-  connectionName: '',
-  connectionString: '',
-});
+const getDefaultConnection = () =>
+  ({
+    connectionId: crypto.randomUUID(),
+    connectionName: '',
+    connectionString: '',
+    queryHistory: [],
+  }) as SqlConnection;
 
 type SqlConnectionTableProps = {
   data: SqlConnection[];
   onEdit: (connection: SqlConnection) => void;
   onDelete: (connectionId: SqlConnection) => void;
-  onAdd: (connection: SqlConnection) => void; // Function to handle adding a new connection
+  onAdd: (connection: SqlConnection) => void;
+  onHistory: (connection: SqlConnection) => void;
 };
 
 const SqlConnectionTable: React.FC<SqlConnectionTableProps> = ({
@@ -40,6 +40,7 @@ const SqlConnectionTable: React.FC<SqlConnectionTableProps> = ({
   onEdit,
   onDelete,
   onAdd,
+  onHistory,
 }) => {
   return (
     <TableContainer component={Paper}>
@@ -77,6 +78,9 @@ const SqlConnectionTable: React.FC<SqlConnectionTableProps> = ({
                 </IconButton>
                 <IconButton color="error" onClick={() => onDelete(connection)}>
                   <DeleteIcon />
+                </IconButton>
+                <IconButton color="secondary" onClick={() => onHistory(connection)}>
+                  <HistoryIcon />
                 </IconButton>
               </TableCell>
             </TableRow>

@@ -10,8 +10,15 @@ export type EventResponse = {
   method: string;
 };
 
+export type QueryHistory = {
+  queryHistoryItemId: string;
+  sql: string;
+  rowCountResult: number;
+};
+
 export type SqlConnection = {
   connectionId: string;
   connectionName: string;
   connectionString: string;
+  queryHistory: QueryHistory[];
 };
