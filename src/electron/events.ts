@@ -85,8 +85,6 @@ const eventsArray = [
                 })
               : [];
 
-          
-          console.dir(result)
           const generatedResponsePayload = { channel: this.channel, payload: { recordset, columns } } as EventResponse;
 
           event.reply(`${this.channel}-response`, generatedResponsePayload);

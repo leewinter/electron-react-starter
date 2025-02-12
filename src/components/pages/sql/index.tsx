@@ -8,11 +8,13 @@ import { EventRequest, SqlConnection } from '../../../types/events';
 import { useSqlConnections } from '../../sql/hooks/use-sql-connections';
 import { useEventChannel } from '../../../hooks/use-event-channel'
 import { DataChannel } from '../../../electron/data-channels';
+import ReportGrid from '../../sql/sql-result-grid'
 
 export default function SqlPage() {
   const [selectedConnection, setSelectedConnection] = useState<SqlConnection | undefined>(undefined);
   const [connections, setConnections] = useState<Array<SqlConnection>>([]);
   const [code, setCode] = useState<string>();
+  const [sqlResults, setSqlResults] = useState<any | undefined>(undefined);
   const { getItem } = useSqlConnections();
 
   const { sendMessage, onMessage, removeListener } = useEventChannel({ channel: DataChannel.SQL_EXECUTE })
@@ -51,10 +53,14 @@ export default function SqlPage() {
           <Button disabled={!selectedConnection || !code} onClick={() => {
             sendMessage({ channel: DataChannel.SQL_EXECUTE, payload: { sql: code, selectedConnection } } as EventRequest)
             onMessage((response) => {
-              console.log('SqlPage', response)
+              setSqlResults( response.payload)
               removeListener();
             });
           }}>Execute</Button>
+        </Grid2>
+
+        <Grid2 size={12}>
+          <ReportGrid sqlResults={sqlResults} />
         </Grid2>
 
       </Grid2>
