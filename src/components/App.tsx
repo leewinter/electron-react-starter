@@ -44,6 +44,7 @@ declare global {
     electron: {
       sendMessage: (channel: string, data: EventResponse) => void;
       onMessage: (channel: string, func: (data: EventResponse) => void) => void;
+      removeListener: (channel: string) => void;
     };
   }
 }

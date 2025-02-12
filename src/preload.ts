@@ -7,6 +7,9 @@ contextBridge.exposeInMainWorld("electron", {
     ipcRenderer.send(channel, data);
   },
   onMessage: (channel: string, callback: (...args: any[]) => void) => {
-    ipcRenderer.on(channel, (event, ...args) => callback(...args));
+    ipcRenderer.on(channel, (_, data) => callback(data));
   },
+  removeListener: (channel: string) => {
+    ipcRenderer.removeAllListeners(channel);
+  }
 });
