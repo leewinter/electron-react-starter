@@ -11,7 +11,12 @@ export const parseSqlConnectionString = (connectionString: string) => {
 
     switch (typeof key === 'string' ? key.toLowerCase() : '') {
       case 'data source':
-        config.server = value;
+        // Check if a port is specified
+        const [server, port] = value.split(',');
+        config.server = server.trim();
+        if (port) {
+          config.port = parseInt(port.trim(), 10);
+        }
         break;
       case 'initial catalog':
         config.database = value;
@@ -23,13 +28,13 @@ export const parseSqlConnectionString = (connectionString: string) => {
         config.password = value;
         break;
       case 'trustservercertificate':
-        config.options = { trustServerCertificate: Boolean(value) == true };
+        config.options = { ...(config.options || {}), trustServerCertificate: value.toLowerCase() === 'true' };
         break;
       case 'application name':
         config.options = { ...(config.options || {}), appName: value };
         break;
       case 'multipleactiveresultsets':
-        config.options = { ...(config.options || {}), multipleActiveResultSets: Boolean(value) == true };
+        config.options = { ...(config.options || {}), multipleActiveResultSets: value.toLowerCase() === 'true' };
         break;
     }
   });
