@@ -7,7 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 import { EventRequest, SqlConnection } from '../../../types/events';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { DataChannel } from '../../../electron/data-channels';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -29,10 +29,34 @@ export default function SqlPage() {
   const [isEditorExpanded, setIsEditorExpanded] = useState(true);
   const [isResultsExpanded, setIsResultsExpanded] = useState(false);
 
-  const { getItem } = useSqlConnections();
+  const { getItem, setItem } = useSqlConnections();
   const { sendMessage, onMessage, removeListener } = useEventChannel({
     channel: DataChannel.SQL_EXECUTE,
   });
+
+  const handleUpdateConnectionHistory = (
+    selectedConnection: SqlConnection,
+    code: string,
+    payload: any
+  ) => {
+    var updated = connections.map(c =>
+      c.connectionId === selectedConnection.connectionId
+        ? {
+            ...selectedConnection,
+            queryHistory: [
+              ...(selectedConnection.queryHistory || []),
+              {
+                rowCountResult: payload.recordset.length,
+                queryHistoryItemId: crypto.randomUUID(),
+                sql: code,
+              },
+            ],
+          }
+        : c
+    );
+    setItem(updated);
+    setConnections(updated);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,6 +104,7 @@ export default function SqlPage() {
                 // Minimize editor and expand results
                 setIsEditorExpanded(false);
                 setIsResultsExpanded(true);
+                handleUpdateConnectionHistory(selectedConnection, code, response.payload);
               });
             }}
           >

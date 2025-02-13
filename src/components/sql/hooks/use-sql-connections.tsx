@@ -1,5 +1,5 @@
+import { SqlConnection } from 'src/types/events';
 import localforage from 'localforage';
-import { SqlConnection } from '../sql-connection-grid';
 
 export const useSqlConnections = () => {
   return {
