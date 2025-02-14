@@ -1,18 +1,4 @@
 {
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "NodeNext",
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "noImplicitAny": true,
-    "sourceMap": true,
-    "allowSyntheticDefaultImports": true,
-    "baseUrl": ".",
-    "rootDir": ".",
-    "outDir": "./publish",
-    "moduleResolution": "NodeNext",
-    "resolveJsonModule": true,
-    "jsx": "react-jsx"
-  }
+  "files": [],
+  "references": [{ "path": "./tsconfig.node.json" }, { "path": "./tsconfig.web.json" }]
 }
