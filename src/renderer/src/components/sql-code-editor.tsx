@@ -22,7 +22,7 @@ const SqlEditor: React.FC<{
   onChange: (updatedValue: string) => void;
 }> = ({ code, onChange }) => {
   const [currentCode, setCurrentCode] = useState<string | undefined>(code);
-  const [codeDirty, setCodeDirty] = useState(false);
+  const [codeDirty, setCodeDirty] = useState(true);
   // const [errors, setErrors] = useState('')
 
   const { sendMessage, onMessage, removeListener } = useEventChannel({

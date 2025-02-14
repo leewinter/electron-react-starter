@@ -16,10 +16,11 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import HomeIcon from '@mui/icons-material/Home';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import StorageIcon from '@mui/icons-material/Storage';
 import { Outlet } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
+import ThemeToggleButton from '../components/theme/ToggleThemeButton';
 
 const drawerWidth = 240;
 
@@ -138,11 +139,17 @@ export default function MiniDrawer(): JSX.Element {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
+
+          {/* 👇 This will push everything else to the right */}
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Mini variant drawer
           </Typography>
+
+          {/* Theme Toggle Button will now be aligned to the far right */}
+          <ThemeToggleButton />
         </Toolbar>
       </AppBar>
+
       <Drawer variant="permanent" open={open}>
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
@@ -185,7 +192,7 @@ export default function MiniDrawer(): JSX.Element {
                     },
                 ]}
               >
-                <HomeIcon />
+                <DashboardIcon />
               </ListItemIcon>
               <ListItemText
                 primary={'Dashboard'}

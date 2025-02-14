@@ -58,12 +58,12 @@ const sqlTypeMappings: Record<
   UniqueIdentifier: String,
 };
 
-const mapColumnType = (col: any) => {
+const mapColumnType = (col: any): any => {
   return {
     ...col,
     camelName: camelCase(col.name),
     jsType: sqlTypeMappings[col.type],
-    validate(value: string) {
+    validate(value: string): { valid: boolean; message?: string } {
       return this.nullable
         ? { valid: true }
         : value === undefined || value === null || value === ''
