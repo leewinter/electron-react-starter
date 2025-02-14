@@ -1,21 +1,21 @@
-import { Route, HashRouter as Router, Routes } from 'react-router-dom'
+import { Route, HashRouter as Router, Routes } from 'react-router-dom';
 
-import App from './App'
-import DashboardPage from './pages/DashboardPage'
-import Layout from './layouts/dashboard'
-import SqlPage from './pages/SqlPage'
+import App from './App';
+import DashboardPage from './pages/DashboardPage';
+import SqlPage from './pages/SqlPage';
+import MiniDrawer from './layouts/DrawerLayout';
 
-const RouterComponent = () => (
+const RouterComponent: React.FC = () => (
   <Router>
     <Routes>
       <Route path="/" element={<App />}>
-        <Route path="/" element={<Layout />}>
+        <Route path="/" element={<MiniDrawer />}>
           <Route index element={<DashboardPage />} />
           <Route path="/sql" element={<SqlPage />} />
         </Route>
       </Route>
     </Routes>
   </Router>
-)
+);
 
-export default RouterComponent
+export default RouterComponent;

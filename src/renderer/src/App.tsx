@@ -1,30 +1,30 @@
-import { ThemeProvider, createTheme } from '@mui/material/styles'
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 // import DashboardIcon from '@mui/icons-material/Dashboard'
-import { Outlet } from 'react-router'
+import { Outlet } from 'react-router';
 // import StorageIcon from '@mui/icons-material/Storage'
 
 const customTheme = createTheme({
   cssVariables: {
-    colorSchemeSelector: 'data-toolpad-color-scheme'
+    colorSchemeSelector: 'data-toolpad-color-scheme',
   },
   colorSchemes: {
     dark: {
       palette: {
         background: {
           default: '#2A4364',
-          paper: '#112E4D'
-        }
-      }
+          paper: '#112E4D',
+        },
+      },
     },
     light: {
       palette: {
         background: {
           default: '#F9F9FE',
-          paper: '#EEEEF9'
-        }
-      }
-    }
+          paper: '#EEEEF9',
+        },
+      },
+    },
   },
   breakpoints: {
     values: {
@@ -32,10 +32,10 @@ const customTheme = createTheme({
       sm: 600,
       md: 600,
       lg: 1200,
-      xl: 1536
-    }
-  }
-})
+      xl: 1536,
+    },
+  },
+});
 
 // const NAVIGATION: Navigation = [
 //   {
@@ -53,12 +53,12 @@ const customTheme = createTheme({
 //   }
 // ]
 
-function App() {
+function App(): JSX.Element {
   return (
     <ThemeProvider theme={customTheme} defaultMode="dark">
       <Outlet />
     </ThemeProvider>
-  )
+  );
 }
 
-export default App
+export default App;

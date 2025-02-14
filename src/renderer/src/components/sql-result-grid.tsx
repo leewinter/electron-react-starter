@@ -120,12 +120,12 @@ const getColumnDefinitions = (
         field: '',
         sortable: false,
         filterable: false,
-        renderCell: (cellValues: any) => (
+        renderCell: (): JSX.Element => (
           <Button
             size="small"
             variant="contained"
             className="from-primary-darkest to-primary-dark mb-2 mt-2 !rounded-lg bg-gradient-to-b text-xs disabled:!text-gray-300 disabled:opacity-60"
-            onClick={() => console.log('handleEditClick')}
+            onClick={(): void => console.log('handleEditClick')}
           >
             Edit
           </Button>
@@ -160,7 +160,7 @@ const ReportGrid: React.FC<ReportGridProps> = ({ sqlResults }) => {
   useEffect(() => {
     setIsMounted(true);
 
-    const loadReport = async () => {
+    const loadReport = async (): Promise<void> => {
       if (!sqlResults) return;
       setLoading(true);
       try {
@@ -225,12 +225,14 @@ const ReportGrid: React.FC<ReportGridProps> = ({ sqlResults }) => {
                   backgroundColor: '#f7f9fc', // Slightly different from white
                   border: '1px solid #ddd', // Subtle border to separate from background
                 }}
-                rows={rows}
-                getRowId={row => row.index}
+                rows={rows || []}
+                getRowId={(row): number => row.index}
                 columns={columnDefinitions}
                 rowHeight={40}
                 density="compact"
                 slots={{ toolbar: CustomToolbar }}
+                rowCount={rows.length || 0}
+                paginationMode="client"
               />
             </Box>
           </div>

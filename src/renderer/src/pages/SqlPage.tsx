@@ -21,7 +21,7 @@ import { useSqlConnections } from '../hooks/use-sql-connections';
 export default function SqlPage(): JSX.Element {
   const [selectedConnection, setSelectedConnection] = useState<SqlConnection | null>(null);
   const [connections, setConnections] = useState<Array<SqlConnection>>([]);
-  const [code, setCode] = useState<string>('');
+  const [code, setCode] = useState<string>('select  * from  cyn.Roles');
   const [sqlResults, setSqlResults] = useState<any | undefined>(undefined);
   const [isEditorExpanded, setIsEditorExpanded] = useState(true);
   const [isResultsExpanded, setIsResultsExpanded] = useState(false);
@@ -64,7 +64,7 @@ export default function SqlPage(): JSX.Element {
   }, []);
 
   return (
-    <Container sx={{ mt: 3 }} maxWidth={true}>
+    <Container sx={{ mt: 3 }} maxWidth={false}>
       {/* SQL Connection Select */}
       <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
         <SqlConnectionSelect
