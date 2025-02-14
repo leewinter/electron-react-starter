@@ -13,6 +13,7 @@ module.exports = {
       'error',
       {
         endOfLine: 'auto',
+        arrowParens: 'avoid',
       },
     ],
   },

@@ -99,8 +99,8 @@ const constructJson = (columns: Array<ColumType>, recordset: Array<any>): Array<
 };
 
 const getColumnDefinitions = (
-  columns: { name: string; camelName: string; type: string; jsType: () => string }[]
-) => {
+  columns: { name: string; camelName: string; type: string; jsType: () => string }[],
+): any[] => {
   return columns.map(col => {
     let definition: any = {
       ...baseColumn,
@@ -186,7 +186,7 @@ const ReportGrid: React.FC<ReportGridProps> = ({ sqlResults }) => {
 
     loadReport();
 
-    return () => {
+    return (): void => {
       setIsMounted(false);
     };
   }, [sqlResults]);

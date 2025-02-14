@@ -140,12 +140,10 @@ export default function MiniDrawer(): JSX.Element {
             <MenuIcon />
           </IconButton>
 
-          {/* 👇 This will push everything else to the right */}
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Mini variant drawer
+            SQL Inspect
           </Typography>
 
-          {/* Theme Toggle Button will now be aligned to the far right */}
           <ThemeToggleButton />
         </Toolbar>
       </AppBar>
