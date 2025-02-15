@@ -1,28 +1,46 @@
-import { SqlConnection } from '../../../preload/index.d'
-import localforage from 'localforage'
+import { SqlConnection } from '../../../preload/index.d';
+import localforage from 'localforage';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-export const useSqlConnections = (): {
-  getItem: () => Promise<SqlConnection[] | undefined>
-  setItem: (connections: SqlConnection[]) => Promise<SqlConnection[]>
-} => {
-  return {
-    getItem: async function (): Promise<SqlConnection[] | undefined> {
+type SqlConnectionsHookResponse = {
+  connections: SqlConnection[];
+  setConnections: (connections: SqlConnection[]) => void;
+};
+
+export const useSqlConnections = (): SqlConnectionsHookResponse => {
+  const queryClient = useQueryClient();
+
+  const { data: connections } = useQuery({
+    queryKey: ['SQL_CONNECTIONS'],
+    queryFn: async () => {
       try {
-        const value = await localforage.getItem('sql-connections')
-        return value as SqlConnection[]
+        const value = await localforage.getItem('sql-connections');
+        return value as SqlConnection[];
       } catch (err) {
-        console.log(err)
-        return undefined
+        console.log(err);
+        return undefined;
       }
     },
-    setItem: async function (connections: SqlConnection[]): Promise<SqlConnection[]> {
+  });
+
+  const { mutate: setConnections } = useMutation({
+    mutationFn: async function (connections: SqlConnection[]): Promise<SqlConnection[]> {
       try {
-        const value = await localforage.setItem('sql-connections', connections)
-        return value
+        const value = await localforage.setItem('sql-connections', connections);
+        return value;
       } catch (err) {
-        console.log(err)
-        return connections
+        console.log(err);
+        return connections;
       }
-    }
-  }
-}
+    },
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ['SQL_CONNECTIONS'] });
+    },
+  });
+
+  return {
+    connections: connections ?? [],
+    setConnections,
+  };
+};
