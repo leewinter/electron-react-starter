@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
   TextField,
   Button,
@@ -6,66 +6,66 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
-} from '@mui/material'
-import { type SqlConnection } from '../../../preload/index.d'
+  DialogActions,
+} from '@mui/material';
+import { type SqlConnection } from '../../../preload/index.d';
 
 type SqlConnectionDialogProps = {
-  open: boolean
-  initialData: SqlConnection | undefined
-  onClose: () => void
-  onSubmit: (data: SqlConnection) => void
-}
+  open: boolean;
+  initialData: SqlConnection | undefined;
+  onClose: () => void;
+  onSubmit: (data: SqlConnection) => void;
+};
 
 const SqlConnectionDialog: React.FC<SqlConnectionDialogProps> = ({
   open,
   initialData,
   onClose,
-  onSubmit
+  onSubmit,
 }) => {
-  const [formData, setFormData] = useState<SqlConnection | undefined>(initialData)
-  const [errors, setErrors] = useState<{ [key in keyof SqlConnection]?: string }>({})
+  const [formData, setFormData] = useState<SqlConnection | undefined>(initialData);
+  const [errors, setErrors] = useState<{ [key in keyof SqlConnection]?: string }>({});
 
   useEffect(() => {
     if (initialData) {
-      if (!formData) setFormData(initialData)
-      else if (initialData.connectionId !== formData.connectionId) setFormData(initialData)
+      if (!formData) setFormData(initialData);
+      else if (initialData.connectionId !== formData.connectionId) setFormData(initialData);
     }
-  }, [initialData])
+  }, [initialData]);
 
-  if (!initialData) return null
+  if (!initialData) return null;
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target
-    setFormData((prev) => ({
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    const { name, value } = event.target;
+    setFormData((prev: SqlConnection | undefined) => ({
       ...prev,
-      [name]: value,
       connectionId: prev?.connectionId || '',
       connectionName: prev?.connectionName || '',
-      connectionString: prev?.connectionString || ''
-    }))
-  }
+      connectionString: prev?.connectionString || '',
+      [name]: value,
+    }));
+  };
 
-  const validate = () => {
-    const newErrors: { [key in keyof SqlConnection]?: string } = {}
-    if (!formData?.connectionName?.trim()) newErrors.connectionName = 'Connection Name is required'
+  const validate = (): boolean => {
+    const newErrors: { [key in keyof SqlConnection]?: string } = {};
+    if (!formData?.connectionName?.trim()) newErrors.connectionName = 'Connection Name is required';
     if (!formData?.connectionString?.trim())
-      newErrors.connectionString = 'Connection String is required'
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+      newErrors.connectionString = 'Connection String is required';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault()
+  const handleSubmit = (event: React.FormEvent): void => {
+    event.preventDefault();
     if (validate()) {
       if (formData) {
-        onSubmit(formData)
+        onSubmit(formData);
       }
-      onClose() // Close dialog after submitting
+      onClose(); // Close dialog after submitting
     }
-  }
+  };
 
-  if (!formData) return null
+  if (!formData) return null;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -114,7 +114,7 @@ const SqlConnectionDialog: React.FC<SqlConnectionDialogProps> = ({
         </Button>
       </DialogActions>
     </Dialog>
-  )
-}
+  );
+};
 
-export default SqlConnectionDialog
+export default SqlConnectionDialog;
