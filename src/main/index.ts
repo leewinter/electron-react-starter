@@ -5,6 +5,7 @@ import { electronApp, is, optimizer } from '@electron-toolkit/utils';
 
 import icon from '../../resources/icon.png?asset';
 import { join } from 'path';
+import { HandlerDetails } from 'electron/main';
 
 function createWindow(): void {
   // Create the browser window.
@@ -24,7 +25,7 @@ function createWindow(): void {
     mainWindow.show();
   });
 
-  mainWindow.webContents.setWindowOpenHandler((details) => {
+  mainWindow.webContents.setWindowOpenHandler((details: HandlerDetails) => {
     shell.openExternal(details.url);
     return { action: 'deny' };
   });

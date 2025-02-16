@@ -6,7 +6,14 @@ import {
   Container,
   Typography,
 } from '@mui/material';
-import { EventRequest, SqlConnection, DataChannel } from '../../../preload/index.d';
+import {
+  EventRequest,
+  EventResponse,
+  SqlConnection,
+  DataChannel,
+  SqlExecutionRequestPayload,
+  SqlExecutionResponsePayload,
+} from '../../../preload/index.d';
 import { useState } from 'react';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -21,7 +28,7 @@ import { useSqlConnections } from '../hooks/use-sql-connections';
 export default function SqlPage(): JSX.Element {
   const [selectedConnection, setSelectedConnection] = useState<SqlConnection | null>(null);
   const [code, setCode] = useState<string>('select  * from  cyn.Roles');
-  const [sqlResults, setSqlResults] = useState<any | undefined>(undefined);
+  const [sqlResults, setSqlResults] = useState<SqlExecutionResponsePayload>();
   const [isEditorExpanded, setIsEditorExpanded] = useState(true);
   const [isResultsExpanded, setIsResultsExpanded] = useState(false);
 
@@ -33,7 +40,7 @@ export default function SqlPage(): JSX.Element {
   const handleUpdateConnectionHistory = (
     selectedConnection: SqlConnection,
     code: string,
-    payload: { recordset: Array<any> },
+    payload: { recordset: Array<Array<Record<string, unknown>>> },
   ): void => {
     const updated = connections.map((c: SqlConnection) =>
       c.connectionId === selectedConnection.connectionId
@@ -87,9 +94,9 @@ export default function SqlPage(): JSX.Element {
               sendMessage({
                 channel: DataChannel.SQL_EXECUTE,
                 payload: { sql: code, selectedConnection },
-              } as EventRequest);
+              } as EventRequest<SqlExecutionRequestPayload>);
 
-              onMessage((response) => {
+              onMessage((response: EventResponse<SqlExecutionResponsePayload>) => {
                 setSqlResults(response.payload);
                 removeListener();
 
