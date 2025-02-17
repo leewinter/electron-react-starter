@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   IconButton,
   Dialog,
@@ -33,7 +33,7 @@ const SqlConnectionIcon: React.FC = () => {
 
   const handleSaveConnection = (connection: SqlConnection): void => {
     const updatedConnections = connections.map((n: SqlConnection) =>
-      n.connectionId === connection.connectionId ? connection : n,
+      n.connectionId === connection.connectionId ? connection : n
     );
     if (!updatedConnections.some((n: SqlConnection) => n.connectionId === connection.connectionId))
       updatedConnections.push(connection);
@@ -43,7 +43,7 @@ const SqlConnectionIcon: React.FC = () => {
 
   const handleDeleteConnection = (connection: SqlConnection): void => {
     const updatedConnections = connections.filter(
-      (n: SqlConnection) => n.connectionId !== connection.connectionId,
+      (n: SqlConnection) => n.connectionId !== connection.connectionId
     );
 
     setConnections(updatedConnections);
