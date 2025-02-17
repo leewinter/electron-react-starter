@@ -1,16 +1,16 @@
-export const parseSqlConnectionString = (connectionString: string) => {
+export const parseSqlConnectionString = (connectionString: string): any => {
   const config: any = {};
 
   // Split key-value pairs
   const pairs = connectionString.split(';');
 
-  pairs.forEach(pair => {
-    const [key, value] = pair.split('=').map(part => part.trim());
+  pairs.forEach((pair: string) => {
+    const [key, value] = pair.split('=').map((part: string) => part.trim());
 
     if (!key || !value) return; // Skip empty values
 
     switch (typeof key === 'string' ? key.toLowerCase() : '') {
-      case 'data source':
+      case 'data source': {
         // Check if a port is specified
         const [server, port] = value.split(',');
         config.server = server.trim();
@@ -18,6 +18,7 @@ export const parseSqlConnectionString = (connectionString: string) => {
           config.port = parseInt(port.trim(), 10);
         }
         break;
+      }
       case 'initial catalog':
         config.database = value;
         break;

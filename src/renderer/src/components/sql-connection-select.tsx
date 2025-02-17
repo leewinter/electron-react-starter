@@ -1,28 +1,28 @@
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { useEffect, useState } from 'react';
 
-import { SqlConnection } from '../../../preload/index.d'
-import { useSqlConnections } from '../hooks/use-sql-connections'
+import { SqlConnection } from '../../../preload/index.d';
+import { useSqlConnections } from '../hooks/use-sql-connections';
 
 type SqlConnectionSelectProps = {
-  selectedConnection: SqlConnection | null
-  onChange: (connectionId: string) => void
-}
+  selectedConnection: SqlConnection | null;
+  onChange: (connectionId: string) => void;
+};
 
 const SqlConnectionSelect: React.FC<SqlConnectionSelectProps> = ({
   selectedConnection,
-  onChange
+  onChange,
 }) => {
-  const [connections, setConnections] = useState<Array<SqlConnection>>([])
-  const { getItem } = useSqlConnections()
+  const [connections, setConnections] = useState<Array<SqlConnection>>([]);
+  const { getItem } = useSqlConnections();
 
   useEffect(() => {
     const dataLoad = async () => {
-      const results = await getItem()
-      setConnections(results || [])
-    }
-    dataLoad()
-  }, [])
+      const results = await getItem();
+      setConnections(results || []);
+    };
+    dataLoad();
+  }, []);
 
   return (
     <FormControl fullWidth>
@@ -38,7 +38,7 @@ const SqlConnectionSelect: React.FC<SqlConnectionSelectProps> = ({
         ))}
       </Select>
     </FormControl>
-  )
-}
+  );
+};
 
-export default SqlConnectionSelect
+export default SqlConnectionSelect;
