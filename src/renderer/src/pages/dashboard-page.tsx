@@ -7,7 +7,7 @@ export default function DashboardPage(): JSX.Element {
   const { connections } = useSqlConnections();
   return (
     <Container sx={{ mt: 3 }} maxWidth={false}>
-      <Typography>Welcome to MSSQL Inspect</Typography>
+      <Typography variant="h5">Welcome to MSSQL Inspect</Typography>
       {connections.map(conn => {
         return <QueryHistoryTable key={conn.connectionId} connection={conn} />;
       })}
