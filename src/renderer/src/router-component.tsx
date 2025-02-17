@@ -1,9 +1,9 @@
 import { Route, HashRouter as Router, Routes } from 'react-router-dom';
 
 import App from './App';
-import DashboardPage from './pages/DashboardPage';
+import DashboardPage from './pages/dashboard-page';
 import SqlPage from './pages/SqlPage';
-import MiniDrawer from './layouts/DrawerLayout';
+import MiniDrawer from './layouts/drawer-layout';
 
 const RouterComponent: React.FC = () => (
   <Router>
