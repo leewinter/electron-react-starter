@@ -1,5 +1,4 @@
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import { useEffect, useState } from 'react';
 
 import { SqlConnection } from '../../../preload/index.d';
 import { useSqlConnections } from '../hooks/use-sql-connections';
@@ -13,16 +12,7 @@ const SqlConnectionSelect: React.FC<SqlConnectionSelectProps> = ({
   selectedConnection,
   onChange,
 }) => {
-  const [connections, setConnections] = useState<Array<SqlConnection>>([]);
-  const { getItem } = useSqlConnections();
-
-  useEffect(() => {
-    const dataLoad = async () => {
-      const results = await getItem();
-      setConnections(results || []);
-    };
-    dataLoad();
-  }, []);
+  const { connections } = useSqlConnections();
 
   return (
     <FormControl fullWidth>
@@ -31,7 +21,7 @@ const SqlConnectionSelect: React.FC<SqlConnectionSelectProps> = ({
         value={selectedConnection?.connectionId || ''}
         onChange={(event) => onChange(event.target.value)}
       >
-        {connections.map((conn) => (
+        {connections.map((conn: SqlConnection) => (
           <MenuItem key={conn.connectionId} value={conn.connectionId}>
             {conn.connectionName}
           </MenuItem>

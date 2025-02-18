@@ -17,55 +17,44 @@ import SqlConnectionTable from './sql-connection-grid';
 import { type SqlConnection } from '../../../preload/index.d';
 import { useSqlConnections } from '../hooks/use-sql-connections';
 
-const truncateText = (text: string, maxLength = 100) =>
+const truncateText = (text: string, maxLength = 100): string =>
   text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
 
 const SqlConnectionIcon: React.FC = () => {
-  const [connections, setConnections] = useState<Array<SqlConnection>>([]);
-  const [connectionToEdit, setConnectionToEdit] = useState<SqlConnection | null>(null);
+  const [connectionToEdit, setConnectionToEdit] = useState<SqlConnection | undefined>(undefined);
   const [historyConnection, setHistoryConnection] = useState<SqlConnection | null>(null);
   const [open, setOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
 
-  const { getItem, setItem } = useSqlConnections();
-
-  useEffect(() => {
-    const dataLoad = async (): Promise<void> => {
-      const results = await getItem();
-      setConnections(results || []);
-    };
-    dataLoad();
-  }, []);
+  const { connections, setConnections } = useSqlConnections();
 
   const handleOpen = (): void => setOpen(true);
   const handleClose = (): void => setOpen(false);
 
   const handleSaveConnection = (connection: SqlConnection): void => {
-    const updatedConnections = connections.map((n) =>
+    const updatedConnections = connections.map((n: SqlConnection) =>
       n.connectionId === connection.connectionId ? connection : n,
     );
-    if (!updatedConnections.some((n) => n.connectionId === connection.connectionId))
+    if (!updatedConnections.some((n: SqlConnection) => n.connectionId === connection.connectionId))
       updatedConnections.push(connection);
 
-    setItem(updatedConnections);
     setConnections(updatedConnections);
   };
 
   const handleDeleteConnection = (connection: SqlConnection): void => {
     const updatedConnections = connections.filter(
-      (n) => n.connectionId !== connection.connectionId,
+      (n: SqlConnection) => n.connectionId !== connection.connectionId,
     );
 
-    setItem(updatedConnections);
     setConnections(updatedConnections);
   };
 
-  const handleHistoryOpen = (connection: SqlConnection) => {
+  const handleHistoryOpen = (connection: SqlConnection): void => {
     setHistoryConnection(connection);
     setHistoryOpen(true);
   };
 
-  const handleHistoryClose = () => {
+  const handleHistoryClose = (): void => {
     setHistoryConnection(null);
     setHistoryOpen(false);
   };
@@ -83,16 +72,16 @@ const SqlConnectionIcon: React.FC = () => {
         <DialogContent dividers>
           <SqlConnectionTable
             data={connections}
-            onEdit={(row) => setConnectionToEdit(row)}
-            onDelete={(row) => handleDeleteConnection(row)}
-            onAdd={(row) => {
+            onEdit={(row: SqlConnection) => setConnectionToEdit(row)}
+            onDelete={(row: SqlConnection) => handleDeleteConnection(row)}
+            onAdd={(row: SqlConnection) => {
               setConnectionToEdit(row);
             }}
-            onHistory={(row) => handleHistoryOpen(row)}
+            onHistory={(row: SqlConnection) => handleHistoryOpen(row)}
           />
           <SqlConnectionForm
             initialData={connectionToEdit}
-            onSubmit={(val) => handleSaveConnection(val)}
+            onSubmit={(val: SqlConnection) => handleSaveConnection(val)}
             open={Boolean(connectionToEdit)}
             onClose={() => setConnectionToEdit(undefined)}
           />
