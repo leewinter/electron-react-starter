@@ -1,15 +1,17 @@
+import * as mssql from 'mssql';
+
 import {
   DataChannel,
   EventRequest,
   EventResponse,
-  SqlLintPayload,
-  SqlExecutionResponsePayload,
+  SqlColumn,
   SqlExecutionRequestPayload,
+  SqlExecutionResponsePayload,
+  SqlLintPayload,
 } from '../preload/index.d';
 import { IpcMainEvent, ipcMain } from 'electron';
 
 import { format } from 'sql-formatter';
-import * as mssql from 'mssql';
 import { parseSqlConnectionString } from './lib/sql';
 
 interface EventRegistration {
@@ -64,7 +66,7 @@ const eventsArray = [
 
             const columns =
               Array.isArray(sqlResult?.columns) && Array.isArray(sqlResult.columns[0])
-                ? sqlResult.columns[0].map((col: any) => {
+                ? sqlResult.columns[0].map((col: SqlColumn) => {
                     return {
                       name: col.name,
                       type: col.type.name,

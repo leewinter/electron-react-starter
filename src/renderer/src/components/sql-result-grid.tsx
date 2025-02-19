@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import {
   DataGrid,
-  GridToolbarContainer,
   GridToolbarColumnsButton,
-  GridToolbarFilterButton,
+  GridToolbarContainer,
   GridToolbarExport,
+  GridToolbarFilterButton,
 } from '@mui/x-data-grid';
+import React, { useEffect, useState } from 'react';
+import { SqlColumn, SqlExecutionResponsePayload } from '../../../preload/index.d';
+
 import camelCase from 'lodash.camelcase';
 import { useTheme } from '@mui/material/styles';
-import { SqlExecutionResponsePayload } from '../../../preload/index.d';
 
 interface ReportGridProps {
   sqlResults: SqlExecutionResponsePayload | undefined;
@@ -54,7 +55,13 @@ const sqlTypeMappings: Record<
   UniqueIdentifier: String,
 };
 
-const mapColumnType = (col: any): any => {
+type MappedColumnType = SqlColumn & {
+  camelName: string;
+  jsType: BooleanConstructor | NumberConstructor | StringConstructor | DateConstructor;
+  validate: (value: string) => { valid: boolean; message?: string };
+};
+
+const mapColumnType = (col: SqlColumn): MappedColumnType => {
   return {
     ...col,
     camelName: camelCase(col.name),
@@ -69,19 +76,22 @@ const mapColumnType = (col: any): any => {
   };
 };
 
-type ColumType = {
-  camelName: string;
-  type: string;
-};
+// type ColumType = {
+//   camelName: string;
+//   type: string;
+// };
 
 type DynamicObject = {
   [key: string]: string | number | boolean | Date;
 };
 
-const constructJson = (columns: Array<ColumType>, recordset: Array<any>): Array<DynamicObject> => {
+const constructJson = (
+  columns: Array<MappedColumnType>,
+  recordset: Array<any>,
+): Array<DynamicObject> => {
   const result = recordset.map((row) => {
     const obj: DynamicObject = {};
-    columns.forEach((column: ColumType, indexKey: number) => {
+    columns.forEach((column: MappedColumnType, indexKey: number) => {
       if (['DateTime', 'Date'].includes(column.type) && row[indexKey]) {
         // Removing the final "Z" to stop timezone adjustment - which includes DST adjustment
         // obj[column.camelName] = new Date(row[indexKey].replace('Z', ''));
@@ -94,9 +104,7 @@ const constructJson = (columns: Array<ColumType>, recordset: Array<any>): Array<
   return result;
 };
 
-const getColumnDefinitions = (
-  columns: { name: string; camelName: string; type: string; jsType: () => string }[],
-): any[] => {
+const getColumnDefinitions = (columns: MappedColumnType[]): any[] => {
   return columns.map((col) => {
     let definition: any = {
       ...baseColumn,
@@ -163,7 +171,15 @@ const ReportGrid: React.FC<ReportGridProps> = ({ sqlResults }) => {
         if (isMounted) {
           const columnsMappedAsType = [
             ...sqlResults.columns,
-            { name: 'index', field: 'index', type: 'Numeric', nullable: false },
+            {
+              name: 'index',
+              field: 'index',
+              type: 'Numeric',
+              nullable: false,
+              length: 0,
+              precision: 0,
+              scale: 0,
+            },
           ].map(mapColumnType);
 
           const columnDefs = getColumnDefinitions(columnsMappedAsType);

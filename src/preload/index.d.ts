@@ -42,10 +42,12 @@ export type SqlLintPayload = {
   sql: string;
 };
 
+SqlColumnType = { name: string };
+
 // Execute
 export type SqlColumn = {
   name: string;
-  type: string;
+  type: string | SqlColumnType;
   length: number;
   nullable: boolean;
   precision: number;
@@ -53,7 +55,7 @@ export type SqlColumn = {
 };
 
 export type SqlExecutionResponsePayload = {
-  recordset: Array<Array<any>>;
+  recordset: Array<Array<unknow>>;
   columns: SqlColumn[];
 };
 
