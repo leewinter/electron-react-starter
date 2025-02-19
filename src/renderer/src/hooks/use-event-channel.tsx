@@ -1,26 +1,32 @@
-import { type EventRequest, type EventResponse } from '../../../preload/index.d'
+import { type EventRequest, type EventResponse } from '../../../preload/index.d';
 
-export const useEventChannel = ({ channel }: { channel: string }) => {
+type EventChannelHookResponse = {
+  sendMessage: (msg: EventRequest) => void;
+  onMessage: (response: (data: EventResponse) => void) => void;
+  removeListener: () => void;
+};
+
+export const useEventChannel = ({ channel }: { channel: string }): EventChannelHookResponse => {
   return {
-    sendMessage: function (msg: EventRequest) {
+    sendMessage: function (msg: EventRequest): void {
       if (channel) {
         // Send message to Electron
-        window.api.sendMessage(`${channel}-request`, msg)
+        window.api.sendMessage(`${channel}-request`, msg);
       }
     },
-    onMessage: function (response: (data: EventResponse) => void) {
+    onMessage: function (response: (data: EventResponse) => void): void {
       if (channel && response) {
         // Listen for response from Electron
-        window.api.onMessage(`${channel}-response`, (data) => {
-          if (response) response(data)
-        })
+        window.api.onMessage(`${channel}-response`, (data: EventResponse) => {
+          if (response) response(data);
+        });
       }
     },
-    removeListener: function () {
+    removeListener: function (): void {
       if (channel) {
         // Remove listener
-        window.api.removeListener(`${channel}-response`)
+        window.api.removeListener(`${channel}-response`);
       }
-    }
-  }
-}
+    },
+  };
+};
