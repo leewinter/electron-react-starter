@@ -62,7 +62,7 @@ const SqlEditor: React.FC<{
           setCodeDirty(true);
         }}
         padding={15}
-        style={{ fontSize: 14, backgroundColor: theme.palette.grey[900], fontFamily: 'monospace' }}
+        style={{ fontSize: 14, backgroundColor: theme.palette.grey[50], fontFamily: 'monospace' }}
       />
       {/* <div style={{ color: errors.includes('✅') ? 'green' : 'red', marginTop: '10px' }}>
         {errors}
