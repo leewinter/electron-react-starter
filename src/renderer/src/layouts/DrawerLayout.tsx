@@ -59,7 +59,7 @@ interface AppBarProps extends MuiAppBarProps {
 }
 
 const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: prop => prop !== 'open',
+  shouldForwardProp: (prop): boolean => prop !== 'open',
 })<AppBarProps>(({ theme }) => ({
   zIndex: theme.zIndex.drawer + 1,
   transition: theme.transitions.create(['width', 'margin'], {
@@ -68,7 +68,7 @@ const AppBar = styled(MuiAppBar, {
   }),
   variants: [
     {
-      props: ({ open }) => open,
+      props: ({ open }): boolean | undefined => open,
       style: {
         marginLeft: drawerWidth,
         width: `calc(100% - ${drawerWidth}px)`,
@@ -81,28 +81,30 @@ const AppBar = styled(MuiAppBar, {
   ],
 }));
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' })(({ theme }) => ({
-  width: drawerWidth,
-  flexShrink: 0,
-  whiteSpace: 'nowrap',
-  boxSizing: 'border-box',
-  variants: [
-    {
-      props: ({ open }) => open,
-      style: {
-        ...openedMixin(theme),
-        '& .MuiDrawer-paper': openedMixin(theme),
+const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop): boolean => prop !== 'open' })(
+  ({ theme }) => ({
+    width: drawerWidth,
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+    boxSizing: 'border-box',
+    variants: [
+      {
+        props: ({ open }): boolean | undefined => open,
+        style: {
+          ...openedMixin(theme),
+          '& .MuiDrawer-paper': openedMixin(theme),
+        },
       },
-    },
-    {
-      props: ({ open }) => !open,
-      style: {
-        ...closedMixin(theme),
-        '& .MuiDrawer-paper': closedMixin(theme),
+      {
+        props: ({ open }): boolean | undefined => !open,
+        style: {
+          ...closedMixin(theme),
+          '& .MuiDrawer-paper': closedMixin(theme),
+        },
       },
-    },
-  ],
-}));
+    ],
+  }),
+);
 
 export default function MiniDrawer(): JSX.Element {
   const theme = useTheme();
@@ -110,7 +112,7 @@ export default function MiniDrawer(): JSX.Element {
 
   const location = useLocation();
 
-  const isActive = path => location.pathname === path;
+  const isActive = (path): boolean => location.pathname === path;
 
   const handleDrawerOpen = (): void => {
     setOpen(true);
@@ -168,11 +170,11 @@ export default function MiniDrawer(): JSX.Element {
                 },
                 open
                   ? {
-                    justifyContent: 'initial',
-                  }
+                      justifyContent: 'initial',
+                    }
                   : {
-                    justifyContent: 'center',
-                  },
+                      justifyContent: 'center',
+                    },
               ]}
             >
               <ListItemIcon
@@ -183,11 +185,11 @@ export default function MiniDrawer(): JSX.Element {
                   },
                   open
                     ? {
-                      mr: 3,
-                    }
+                        mr: 3,
+                      }
                     : {
-                      mr: 'auto',
-                    },
+                        mr: 'auto',
+                      },
                 ]}
               >
                 <DashboardIcon />
@@ -197,11 +199,11 @@ export default function MiniDrawer(): JSX.Element {
                 sx={[
                   open
                     ? {
-                      opacity: 1,
-                    }
+                        opacity: 1,
+                      }
                     : {
-                      opacity: 0,
-                    },
+                        opacity: 0,
+                      },
                 ]}
               />
             </ListItemButton>
@@ -218,11 +220,11 @@ export default function MiniDrawer(): JSX.Element {
                 },
                 open
                   ? {
-                    justifyContent: 'initial',
-                  }
+                      justifyContent: 'initial',
+                    }
                   : {
-                    justifyContent: 'center',
-                  },
+                      justifyContent: 'center',
+                    },
               ]}
             >
               <ListItemIcon
@@ -233,11 +235,11 @@ export default function MiniDrawer(): JSX.Element {
                   },
                   open
                     ? {
-                      mr: 3,
-                    }
+                        mr: 3,
+                      }
                     : {
-                      mr: 'auto',
-                    },
+                        mr: 'auto',
+                      },
                 ]}
               >
                 <StorageIcon />
@@ -247,11 +249,11 @@ export default function MiniDrawer(): JSX.Element {
                 sx={[
                   open
                     ? {
-                      opacity: 1,
-                    }
+                        opacity: 1,
+                      }
                     : {
-                      opacity: 0,
-                    },
+                        opacity: 0,
+                      },
                 ]}
               />
             </ListItemButton>
