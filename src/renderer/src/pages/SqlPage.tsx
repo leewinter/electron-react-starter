@@ -6,14 +6,14 @@ import {
   Container,
   Typography,
 } from '@mui/material';
+import { SqlConnection } from '../../../shared/types/sql-connection';
 import {
   EventRequest,
   EventResponse,
-  SqlConnection,
   DataChannel,
   SqlExecutionRequestPayload,
   SqlExecutionResponsePayload,
-} from '../../../preload/index.d';
+} from '../../../shared/types/data-channel.d';
 import { useState } from 'react';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';

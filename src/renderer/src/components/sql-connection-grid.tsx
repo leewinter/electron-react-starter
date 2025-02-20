@@ -16,7 +16,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import HistoryIcon from '@mui/icons-material/History';
-import { SqlConnection } from '../../../preload/index.d';
+import { SqlConnection } from '../../../shared/types/sql-connection';
 
 const getDefaultConnection = () =>
   ({
@@ -58,7 +58,7 @@ const SqlConnectionTable: React.FC<SqlConnectionTableProps> = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((connection) => (
+          {data.map(connection => (
             <TableRow key={connection.connectionId}>
               <TableCell>{connection.connectionName}</TableCell>
               <TableCell

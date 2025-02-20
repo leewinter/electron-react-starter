@@ -2,8 +2,12 @@ import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import CodeEditor from '@uiw/react-textarea-code-editor';
 import { useEventChannel } from '../hooks/use-event-channel';
-import { DataChannel } from '../../../preload/index.d';
-import { type EventRequest, type EventResponse, SqlLintPayload } from '../../../preload/index.d';
+import {
+  type EventRequest,
+  type EventResponse,
+  DataChannel,
+  SqlLintPayload,
+} from '../../../shared/types/data-channel.d';
 import { IconButton, Tooltip } from '@mui/material';
 import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
 

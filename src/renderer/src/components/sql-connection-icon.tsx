@@ -14,7 +14,7 @@ import {
 import StorageIcon from '@mui/icons-material/Storage';
 import SqlConnectionForm from './sql-connection-form';
 import SqlConnectionTable from './sql-connection-grid';
-import { type SqlConnection } from '../../../preload/index.d';
+import { type SqlConnection } from '../../../shared/types/sql-connection';
 import { useSqlConnections } from '../hooks/use-sql-connections';
 
 const truncateText = (text: string, maxLength = 100): string =>
@@ -33,7 +33,7 @@ const SqlConnectionIcon: React.FC = () => {
 
   const handleSaveConnection = (connection: SqlConnection): void => {
     const updatedConnections = connections.map((n: SqlConnection) =>
-      n.connectionId === connection.connectionId ? connection : n
+      n.connectionId === connection.connectionId ? connection : n,
     );
     if (!updatedConnections.some((n: SqlConnection) => n.connectionId === connection.connectionId))
       updatedConnections.push(connection);
@@ -43,7 +43,7 @@ const SqlConnectionIcon: React.FC = () => {
 
   const handleDeleteConnection = (connection: SqlConnection): void => {
     const updatedConnections = connections.filter(
-      (n: SqlConnection) => n.connectionId !== connection.connectionId
+      (n: SqlConnection) => n.connectionId !== connection.connectionId,
     );
 
     setConnections(updatedConnections);

@@ -1,6 +1,6 @@
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 
-import { SqlConnection } from '../../../preload/index.d';
+import { SqlConnection } from '../../shared/types/sql-connection';
 import { useSqlConnections } from '../hooks/use-sql-connections';
 
 type SqlConnectionSelectProps = {
@@ -19,7 +19,7 @@ const SqlConnectionSelect: React.FC<SqlConnectionSelectProps> = ({
       <InputLabel>Select SQL Connection</InputLabel>
       <Select
         value={selectedConnection?.connectionId || ''}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={event => onChange(event.target.value)}
       >
         {connections.map((conn: SqlConnection) => (
           <MenuItem key={conn.connectionId} value={conn.connectionId}>
