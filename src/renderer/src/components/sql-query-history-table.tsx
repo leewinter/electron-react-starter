@@ -16,6 +16,7 @@ import {
   Select,
 } from '@mui/material';
 import { SqlConnection } from '../../../shared/types/sql-connection';
+import SqlDialogQuery from './sql-dialog-query';
 
 interface QueryHistoryProps {
   connection: SqlConnection;
@@ -23,6 +24,7 @@ interface QueryHistoryProps {
 
 const QueryHistoryTable: React.FC<QueryHistoryProps> = ({ connection }) => {
   const { connectionName, queryHistory = [] } = connection;
+  const [query, setQuery] = useState<string | null>(null);
 
   const [queryLimit, setQueryLimit] = useState<number>(5);
 
@@ -73,7 +75,11 @@ const QueryHistoryTable: React.FC<QueryHistoryProps> = ({ connection }) => {
                 </TableHead>
                 <TableBody>
                   {displayedQueries.map(query => (
-                    <TableRow key={query.queryHistoryItemId}>
+                    <TableRow
+                      key={query.queryHistoryItemId}
+                      onClick={() => setQuery(query.sql)}
+                      sx={{ cursor: 'pointer', '&:hover': { backgroundColor: 'action.hover' } }}
+                    >
                       <TableCell>{query.queryHistoryItemId}</TableCell>
                       <TableCell>
                         <Typography
@@ -103,6 +109,14 @@ const QueryHistoryTable: React.FC<QueryHistoryProps> = ({ connection }) => {
           </Typography>
         )}
       </CardContent>
+      <SqlDialogQuery
+        query={query}
+        connection={connection}
+        open={Boolean(query)}
+        onClose={() => {
+          setQuery(null);
+        }}
+      />
     </Card>
   );
 };
