@@ -11,6 +11,7 @@ import { IpcMainEvent, ipcMain } from 'electron';
 import { format } from 'sql-formatter';
 import { parseSqlConnectionString } from './index';
 import * as mssql from 'mssql';
+import getTablesSql from './sql-queries/mssql/get-tables';
 
 type MssqlTediousColumn = {
   index: number;
@@ -85,6 +86,34 @@ export const SqlEventsDictionary = {
           } as EventResponse<SqlExecutionResponsePayload>;
 
           event.reply(`${DataChannel.SQL_EXECUTE}-response`, generatedResponsePayload);
+        } catch (error) {
+          console.error(error);
+        }
+      },
+    );
+  },
+  [DataChannel.SQL_INSPECT_CONNECTION]: function (): void {
+    ipcMain.on(
+      `${DataChannel.SQL_INSPECT_CONNECTION}-request`,
+      async (event: IpcMainEvent, args: EventRequest<SqlExecutionRequestPayload>) => {
+        console.log('Received from React:', args);
+
+        try {
+          const sqlConfig = parseSqlConnectionString(
+            args.payload.selectedConnection.connectionString,
+          );
+
+          sqlConfig.validateConfig();
+
+          await mssql.connect(sqlConfig);
+          const request = new mssql.Request();
+          // request.arrayRowMode = true;
+
+          const result = await request.query(getTablesSql);
+
+          console.log('result', result);
+
+          event.reply(`${DataChannel.SQL_INSPECT_CONNECTION}-response`, result);
         } catch (error) {
           console.error(error);
         }
