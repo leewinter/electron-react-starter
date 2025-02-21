@@ -35,12 +35,12 @@ export type SqlColumn = {
   type: string;
   length: number;
   nullable: boolean;
-  precision: number;
-  scale: number;
+  precision: number | undefined;
+  scale: number | undefined;
 };
 
 export type SqlExecutionResponsePayload = {
-  recordset: Array<Array<any>>;
+  recordset: Array<Array<unknown>>;
   columns: SqlColumn[];
 };
 
