@@ -45,16 +45,17 @@ export default function SqlPage(): JSX.Element {
     const updated = connections.map((c: SqlConnection) =>
       c.connectionId === selectedConnection.connectionId
         ? {
-            ...selectedConnection,
-            queryHistory: [
-              ...(selectedConnection.queryHistory || []),
-              {
-                rowCountResult: payload.recordset.length,
-                queryHistoryItemId: crypto.randomUUID(),
-                sql: code,
-              },
-            ],
-          }
+          ...selectedConnection,
+          queryHistory: [
+            ...(selectedConnection.queryHistory || []),
+            {
+              rowCountResult: payload.recordset.length,
+              queryHistoryItemId: crypto.randomUUID(),
+              sql: code,
+              date: new Date(),
+            },
+          ],
+        }
         : c,
     );
     setConnections(updated);
