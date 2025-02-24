@@ -5,7 +5,7 @@ import {
   SqlLintPayload,
   SqlExecutionResponsePayload,
   SqlExecutionRequestPayload,
-} from '../preload/index.d';
+} from '../shared/types/data-channel.d';
 import { IpcMainEvent, ipcMain } from 'electron';
 
 import { format } from 'sql-formatter';

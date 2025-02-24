@@ -1,4 +1,4 @@
-import { SqlConnection } from '../../../preload/index.d';
+import { SqlConnection } from '../../../shared/types/sql-connection';
 import localforage from 'localforage';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 

@@ -9,7 +9,7 @@ import {
 } from '@mui/x-data-grid';
 import camelCase from 'lodash.camelcase';
 import { useTheme } from '@mui/material/styles';
-import { SqlExecutionResponsePayload } from '../../../preload/index.d';
+import { SqlExecutionResponsePayload } from '../../../shared/types/data-channel.d';
 
 interface ReportGridProps {
   sqlResults: SqlExecutionResponsePayload | undefined;
@@ -79,7 +79,7 @@ type DynamicObject = {
 };
 
 const constructJson = (columns: Array<ColumType>, recordset: Array<any>): Array<DynamicObject> => {
-  const result = recordset.map((row) => {
+  const result = recordset.map(row => {
     const obj: DynamicObject = {};
     columns.forEach((column: ColumType, indexKey: number) => {
       if (['DateTime', 'Date'].includes(column.type) && row[indexKey]) {
@@ -97,7 +97,7 @@ const constructJson = (columns: Array<ColumType>, recordset: Array<any>): Array<
 const getColumnDefinitions = (
   columns: { name: string; camelName: string; type: string; jsType: () => string }[],
 ): any[] => {
-  return columns.map((col) => {
+  return columns.map(col => {
     let definition: any = {
       ...baseColumn,
       headerName: col.name,

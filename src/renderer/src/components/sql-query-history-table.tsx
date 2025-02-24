@@ -15,7 +15,7 @@ import {
   MenuItem,
   Select,
 } from '@mui/material';
-import { SqlConnection } from '../../../preload/index.d';
+import { SqlConnection } from '../../../shared/types/sql-connection';
 
 interface QueryHistoryProps {
   connection: SqlConnection;
