@@ -7,7 +7,7 @@ module.exports = {
     '@electron-toolkit/eslint-config-prettier',
   ],
   rules: {
-    semi: 'off',
+    semi: 'error',
     'linebreak-style': 'off',
     'prettier/prettier': [
       'error',

@@ -14,8 +14,11 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { SqlConnection } from '../../../shared/types/sql-connection';
+import SqlDialogQuery from './sql-dialog-query';
 
 interface QueryHistoryProps {
   connection: SqlConnection;
@@ -23,8 +26,12 @@ interface QueryHistoryProps {
 
 const QueryHistoryTable: React.FC<QueryHistoryProps> = ({ connection }) => {
   const { connectionName, queryHistory = [] } = connection;
-
+  const [query, setQuery] = useState<string | null>(null);
   const [queryLimit, setQueryLimit] = useState<number>(5);
+
+  const theme = useTheme();
+
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
 
   // Determine the queries to show based on the selected limit
   const displayedQueries = queryLimit === -1 ? queryHistory : queryHistory.slice(-queryLimit);
@@ -57,9 +64,11 @@ const QueryHistoryTable: React.FC<QueryHistoryProps> = ({ connection }) => {
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>
-                      <strong>Query ID</strong>
-                    </TableCell>
+                    {!isSmallScreen && (
+                      <TableCell>
+                        <strong>Query ID</strong>
+                      </TableCell>
+                    )}
                     <TableCell>
                       <strong>SQL Query</strong>
                     </TableCell>
@@ -73,8 +82,12 @@ const QueryHistoryTable: React.FC<QueryHistoryProps> = ({ connection }) => {
                 </TableHead>
                 <TableBody>
                   {displayedQueries.map(query => (
-                    <TableRow key={query.queryHistoryItemId}>
-                      <TableCell>{query.queryHistoryItemId}</TableCell>
+                    <TableRow
+                      key={query.queryHistoryItemId}
+                      onClick={() => setQuery(query.sql)}
+                      sx={{ cursor: 'pointer', '&:hover': { backgroundColor: 'action.hover' } }}
+                    >
+                      {!isSmallScreen && <TableCell>{query.queryHistoryItemId}</TableCell>}
                       <TableCell>
                         <Typography
                           variant="body2"
@@ -103,6 +116,14 @@ const QueryHistoryTable: React.FC<QueryHistoryProps> = ({ connection }) => {
           </Typography>
         )}
       </CardContent>
+      <SqlDialogQuery
+        query={query}
+        connection={connection}
+        open={Boolean(query)}
+        onClose={() => {
+          setQuery(null);
+        }}
+      />
     </Card>
   );
 };
