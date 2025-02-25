@@ -51,3 +51,11 @@ export type SqlExecutionRequestPayload = {
 };
 
 // Inspect
+export type SqlConnectionInspectPayload = {
+  connection: SqlConnection;
+  onLoaded: (connection) => void;
+};
+
+export type SqlConnectionInspectPayload = {
+  connection: SqlConnection;
+};
