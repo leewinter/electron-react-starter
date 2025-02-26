@@ -1,5 +1,5 @@
 import Typography from '@mui/material/Typography';
-import { Container } from '@mui/material';
+import { Container, Grid2 } from '@mui/material';
 import { useSqlConnections } from '../hooks/use-sql-connections';
 import QueryHistoryTable from '../components/sql-query-history-table';
 
@@ -8,9 +8,15 @@ export default function DashboardPage(): JSX.Element {
   return (
     <Container sx={{ mt: 3 }} maxWidth={false}>
       <Typography variant="h5">Welcome to MSSQL Inspect</Typography>
-      {connections.map(conn => {
-        return <QueryHistoryTable key={conn.connectionId} connection={conn} />;
-      })}
+      <Grid2 container={true} spacing={2} sx={{ mt: 2 }}>
+        {connections.map(conn => {
+          return (
+            <Grid2 size={{ xs: 12, md: 6, lg: 6 }} key={conn.connectionId}>
+              <QueryHistoryTable connection={conn} />
+            </Grid2>
+          );
+        })}
+      </Grid2>
     </Container>
   );
 }

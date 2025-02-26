@@ -13,12 +13,14 @@ import {
 } from '@mui/material';
 
 import AddIcon from '@mui/icons-material/Add';
+import PropTypes from 'prop-types';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import HistoryIcon from '@mui/icons-material/History';
+import SchemaRoundedIcon from '@mui/icons-material/SchemaRounded';
 import { SqlConnection } from '../../../shared/types/sql-connection';
 
-const getDefaultConnection = () =>
+const getDefaultConnection = (): SqlConnection =>
   ({
     connectionId: crypto.randomUUID(),
     connectionName: '',
@@ -32,6 +34,7 @@ type SqlConnectionTableProps = {
   onDelete: (connectionId: SqlConnection) => void;
   onAdd: (connection: SqlConnection) => void;
   onHistory: (connection: SqlConnection) => void;
+  onSchemaInspect: (connection: SqlConnection) => void;
 };
 
 const SqlConnectionTable: React.FC<SqlConnectionTableProps> = ({
@@ -40,6 +43,7 @@ const SqlConnectionTable: React.FC<SqlConnectionTableProps> = ({
   onDelete,
   onAdd,
   onHistory,
+  onSchemaInspect,
 }) => {
   return (
     <TableContainer component={Paper}>
@@ -58,7 +62,7 @@ const SqlConnectionTable: React.FC<SqlConnectionTableProps> = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map(connection => (
+          {data.map((connection: SqlConnection) => (
             <TableRow key={connection.connectionId}>
               <TableCell>{connection.connectionName}</TableCell>
               <TableCell
@@ -80,6 +84,9 @@ const SqlConnectionTable: React.FC<SqlConnectionTableProps> = ({
                 </IconButton>
                 <IconButton color="secondary" onClick={() => onHistory(connection)}>
                   <HistoryIcon />
+                </IconButton>
+                <IconButton color="secondary" onClick={() => onSchemaInspect(connection)}>
+                  <SchemaRoundedIcon />
                 </IconButton>
               </TableCell>
             </TableRow>
@@ -105,6 +112,20 @@ const SqlConnectionTable: React.FC<SqlConnectionTableProps> = ({
       </Table>
     </TableContainer>
   );
+};
+SqlConnectionTable.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      connectionId: PropTypes.string.isRequired,
+      connectionName: PropTypes.string.isRequired,
+      connectionString: PropTypes.string.isRequired,
+      queryHistory: PropTypes.array.isRequired,
+    }),
+  ).isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onAdd: PropTypes.func.isRequired,
+  onHistory: PropTypes.func.isRequired,
 };
 
 export default SqlConnectionTable;
