@@ -7,7 +7,7 @@ export type SqlConnection = {
     rowCountResult: number;
     queryHistoryItemId: string;
     sql: string;
-    date: Date;
+    date?: Date;
   }>;
   tables?: Array<any>;
   lastInspectDate?: Date;
