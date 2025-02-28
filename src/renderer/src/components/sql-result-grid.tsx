@@ -103,7 +103,7 @@ const getColumnDefinitions = (
       headerName: col.name,
       field: col.camelName,
       hide: col.name.startsWith('_'),
-      type: typeof col.jsType(),
+      type: col.jsType?.name.toLowerCase(),
     };
 
     if (col.type === 'DateTime' || col.type === 'Date') {
@@ -163,7 +163,7 @@ const ReportGrid: React.FC<ReportGridProps> = ({ sqlResults }) => {
         if (isMounted) {
           const columnsMappedAsType = [
             ...sqlResults.columns,
-            { name: 'index', field: 'index', type: 'Numeric', nullable: false },
+            { name: 'index', field: 'index', type: 'Numeric', nullable: false, status: false },
           ].map(mapColumnType);
 
           const columnDefs = getColumnDefinitions(columnsMappedAsType);
@@ -217,9 +217,17 @@ const ReportGrid: React.FC<ReportGridProps> = ({ sqlResults }) => {
               }}
             >
               <DataGrid
+                initialState={{
+                  columns: {
+                    columnVisibilityModel: {
+                      status: false,
+                      index: false,
+                    },
+                  },
+                }}
                 sx={{
-                  backgroundColor: '#f7f9fc', // Slightly different from white
-                  border: '1px solid #ddd', // Subtle border to separate from background
+                  backgroundColor: '#f7f9fc',
+                  border: '1px solid #ddd',
                 }}
                 rows={rows || []}
                 getRowId={(row): number => row.index}

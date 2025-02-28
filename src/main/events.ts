@@ -16,6 +16,10 @@ const eventsArray = [
     channel: DataChannel.SQL_EXECUTE,
     evenRegister: SqlEventsDictionary[DataChannel.SQL_EXECUTE],
   },
+  {
+    channel: DataChannel.SQL_INSPECT_CONNECTION,
+    evenRegister: SqlEventsDictionary[DataChannel.SQL_INSPECT_CONNECTION],
+  },
 ] as EventRegistration[];
 
 eventsArray.forEach((e: EventRegistration) => e.evenRegister());

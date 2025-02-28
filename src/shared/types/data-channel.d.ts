@@ -1,9 +1,11 @@
+import { SqlConnection } from './sql-connection';
 ///
 // Event Payloads
 export enum DataChannel {
   SQL_CONNECTIONS = 'SQL_CONNECTIONS',
   SQL_LINT = 'SQL_LINT',
   SQL_EXECUTE = 'SQL_EXECUTE',
+  SQL_INSPECT_CONNECTION = 'SQL_INSPECT_CONNECTION',
 }
 
 export enum DataChannelMethod {
@@ -35,16 +37,22 @@ export type SqlColumn = {
   type: string;
   length: number;
   nullable: boolean;
-  precision: number;
-  scale: number;
+  precision: number | undefined;
+  scale: number | undefined;
 };
 
 export type SqlExecutionResponsePayload = {
-  recordset: Array<Array<any>>;
+  recordset: Array<Array<unknown>>;
   columns: SqlColumn[];
 };
 
 export type SqlExecutionRequestPayload = {
   sql: string;
   selectedConnection: SqlConnection;
+};
+
+// Inspect
+export type SqlConnectionInspectPayload = {
+  connection: SqlConnection;
+  onLoaded: (connection) => void;
 };

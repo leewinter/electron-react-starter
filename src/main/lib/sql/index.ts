@@ -1,5 +1,40 @@
-export const parseSqlConnectionString = (connectionString: string): any => {
-  const config: any = {};
+import { config } from 'mssql';
+
+interface NtlmAuthentication {
+  type: 'ntlm';
+  options: {
+    userName: string;
+    password: string;
+    domain: string;
+  };
+}
+
+interface SqlConfig extends config {
+  server: string;
+  port?: number;
+  database?: string;
+  user?: string;
+  password?: string;
+  options?: {
+    trustServerCertificate?: boolean;
+    appName?: string;
+    multipleActiveResultSets?: boolean;
+  };
+  authentication?: NtlmAuthentication;
+  validateConfig: () => boolean;
+}
+
+export const parseSqlConnectionString = (connectionString: string): SqlConfig => {
+  const config: SqlConfig = {
+    server: '',
+    validateConfig: (): boolean => {
+      if (!config.server) {
+        throw new Error('Server is undefined in the SQL connection configuration.');
+      }
+
+      return true;
+    },
+  };
 
   // Split key-value pairs
   const pairs = connectionString.split(';');
@@ -48,7 +83,14 @@ export const parseSqlConnectionString = (connectionString: string): any => {
 
   // Determine authentication type
   if (!config.user || !config.password) {
-    config.authentication = { type: 'ntlm' }; // Windows Authentication (Integrated Security)
+    config.authentication = {
+      type: 'ntlm',
+      options: {
+        userName: '',
+        password: '',
+        domain: '',
+      },
+    }; // Windows Authentication (Integrated Security)
   }
 
   return config;

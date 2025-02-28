@@ -16,6 +16,7 @@ import SqlConnectionForm from './sql-connection-form';
 import SqlConnectionTable from './sql-connection-grid';
 import { type SqlConnection } from '../../../shared/types/sql-connection';
 import { useSqlConnections } from '../hooks/use-sql-connections';
+import SqlInspectDialog from './sql-inspect-dialog';
 
 const truncateText = (text: string, maxLength = 100): string =>
   text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
@@ -23,6 +24,7 @@ const truncateText = (text: string, maxLength = 100): string =>
 const SqlConnectionIcon: React.FC = () => {
   const [connectionToEdit, setConnectionToEdit] = useState<SqlConnection | undefined>(undefined);
   const [historyConnection, setHistoryConnection] = useState<SqlConnection | null>(null);
+  const [schemaConnection, setSchemaConnection] = useState<SqlConnection | null>(null);
   const [open, setOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
 
@@ -39,6 +41,7 @@ const SqlConnectionIcon: React.FC = () => {
       updatedConnections.push(connection);
 
     setConnections(updatedConnections);
+    setSchemaConnection(connection);
   };
 
   const handleDeleteConnection = (connection: SqlConnection): void => {
@@ -57,6 +60,14 @@ const SqlConnectionIcon: React.FC = () => {
   const handleHistoryClose = (): void => {
     setHistoryConnection(null);
     setHistoryOpen(false);
+  };
+
+  const handleSchemaOpen = (connection: SqlConnection): void => {
+    setSchemaConnection(connection);
+  };
+
+  const handleSchemaClose = (): void => {
+    setSchemaConnection(null);
   };
 
   return (
@@ -78,6 +89,7 @@ const SqlConnectionIcon: React.FC = () => {
               setConnectionToEdit(row);
             }}
             onHistory={(row: SqlConnection) => handleHistoryOpen(row)}
+            onSchemaInspect={(row: SqlConnection) => handleSchemaOpen(row)}
           />
           <SqlConnectionForm
             initialData={connectionToEdit}
@@ -137,6 +149,12 @@ const SqlConnectionIcon: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <SqlInspectDialog
+        open={Boolean(schemaConnection)}
+        connection={schemaConnection}
+        updateConnection={handleSaveConnection}
+        onClose={handleSchemaClose}
+      />
     </>
   );
 };

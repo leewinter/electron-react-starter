@@ -5,11 +5,42 @@ import {
   SqlLintPayload,
   SqlExecutionResponsePayload,
   SqlExecutionRequestPayload,
+  SqlConnectionInspectPayload,
+  SqlColumn,
 } from '../../../shared/types/data-channel.d';
 import { IpcMainEvent, ipcMain } from 'electron';
 import { format } from 'sql-formatter';
 import { parseSqlConnectionString } from './index';
 import * as mssql from 'mssql';
+import getTablesSql from './sql-queries/mssql/get-tables';
+import getForeignKeys from './sql-queries/mssql/get-foreign-keys';
+import getTableColumns from './sql-queries/mssql/get-table-columns';
+
+type MssqlTediousColumn = {
+  index: number;
+  name: string;
+  length: number;
+  type: () => { name: string };
+  scale: number | undefined;
+  precision: number | undefined;
+  nullable: boolean;
+  caseSensitive: boolean;
+  identity: boolean;
+  readOnly: boolean;
+};
+
+const formatSqlInspect = ({ dbTables, dbForeingKeys, dbColumns }) => {
+  const result = dbTables.recordset.map((t) => {
+    const columns = dbColumns.recordset.filter(
+      (c) => c.SchemaName === t.SchemaName && c.TableName === t.TableName,
+    );
+    const foreignKeys = dbForeingKeys.recordset.filter(
+      (fk) => fk.SchemaName === t.SchemaName && fk.TableName === t.TableName,
+    );
+    return { ...t, columns, foreignKeys };
+  });
+  return result;
+};
 
 export const SqlEventsDictionary = {
   [DataChannel.SQL_LINT]: function (): void {
@@ -51,9 +82,9 @@ export const SqlEventsDictionary = {
 
           const recordset = result.recordset ?? [];
 
-          const columns =
+          const columns: SqlColumn[] =
             Array.isArray(sqlResult?.columns) && Array.isArray(sqlResult.columns[0])
-              ? sqlResult.columns[0].map((col: any) => {
+              ? sqlResult.columns[0].map((col: MssqlTediousColumn) => {
                   return {
                     name: col.name,
                     type: col.type.name,
@@ -61,7 +92,7 @@ export const SqlEventsDictionary = {
                     nullable: col.nullable,
                     precision: col.precision,
                     scale: col.scale,
-                  };
+                  } as SqlColumn;
                 })
               : [];
 
@@ -71,6 +102,47 @@ export const SqlEventsDictionary = {
           } as EventResponse<SqlExecutionResponsePayload>;
 
           event.reply(`${DataChannel.SQL_EXECUTE}-response`, generatedResponsePayload);
+        } catch (error) {
+          console.error(error);
+        }
+      },
+    );
+  },
+  [DataChannel.SQL_INSPECT_CONNECTION]: function (): void {
+    ipcMain.on(
+      `${DataChannel.SQL_INSPECT_CONNECTION}-request`,
+      async (event: IpcMainEvent, args: EventRequest<SqlConnectionInspectPayload>) => {
+        console.log('Received from React:', args);
+
+        try {
+          const sqlConfig = parseSqlConnectionString(args.payload.connection.connectionString);
+
+          sqlConfig.validateConfig();
+
+          await mssql.connect(sqlConfig);
+
+          const request = new mssql.Request();
+
+          const dbTables = await request.query(getTablesSql);
+
+          const dbForeingKeys = await request.query(getForeignKeys);
+
+          const dbColumns = await request.query(getTableColumns);
+
+          const result = formatSqlInspect({ dbTables, dbForeingKeys, dbColumns });
+
+          const connection = {
+            ...args.payload.connection,
+            tables: result,
+            lastInspectDate: new Date(),
+          };
+
+          const generatedResponsePayload = {
+            channel: DataChannel.SQL_INSPECT_CONNECTION,
+            payload: { connection },
+          } as EventResponse<SqlConnectionInspectPayload>;
+
+          event.reply(`${DataChannel.SQL_INSPECT_CONNECTION}-response`, generatedResponsePayload);
         } catch (error) {
           console.error(error);
         }
