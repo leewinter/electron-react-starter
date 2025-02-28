@@ -7,11 +7,13 @@ type SqlConnectionsHookResponse = {
   setConnections: (connections: SqlConnection[]) => void;
 };
 
+const SQL_CONNECTION_KEY = 'SQL_CONNECTIONS'
+
 export const useSqlConnections = (): SqlConnectionsHookResponse => {
   const queryClient = useQueryClient();
 
   const { data: connections } = useQuery({
-    queryKey: ['SQL_CONNECTIONS'],
+    queryKey: [SQL_CONNECTION_KEY],
     queryFn: async () => {
       try {
         const value = await localforage.getItem('sql-connections');
@@ -35,7 +37,7 @@ export const useSqlConnections = (): SqlConnectionsHookResponse => {
     },
     onSuccess: () => {
       // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ['SQL_CONNECTIONS'] });
+      queryClient.invalidateQueries({ queryKey: [SQL_CONNECTION_KEY] });
     },
   });
 

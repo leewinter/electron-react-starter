@@ -5,7 +5,6 @@ import { electronAPI } from '@electron-toolkit/preload';
 // Custom APIs for renderer
 const api = {
   sendMessage: (channel: string, data: any): void => {
-    console.log('thing');
     ipcRenderer.send(channel, data);
   },
   onMessage: (channel: string, callback: (...args: any[]) => void): void => {

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import {
@@ -17,11 +17,13 @@ import LinkIcon from '@mui/icons-material/Link'; // Foreign Key Icon
 import StorageIcon from '@mui/icons-material/Storage'; // Database Icon
 import { SqlConnection } from 'src/shared/types/sql-connection';
 import SqlConnectionInspect from './sql-connection-inspect';
+import ContextMenuComponent from './sql-inspect-dialog-context-menu'
 
 // Represents a single Foreign Key reference
 export interface ForeignKey {
   id: string;
   name: string; // e.g., "SurveyId → Surveys.SurveyId"
+  fullName: string;
   type: 'foreignKey';
 }
 
@@ -29,6 +31,7 @@ export interface ForeignKey {
 export interface Column {
   id: string;
   name: string; // e.g., "SurveyId (int)"
+  fullName: string;
   type: 'column';
   children: ForeignKey[]; // Foreign keys mapped under their respective column
 }
@@ -80,7 +83,8 @@ function mapSqlSchemaToTreeData(tables: any[]): SqlSchemaTree {
     tableNode.children = columns.map((col): Column => {
       const colNode: Column = {
         id: `col-${SchemaName}-${TableName}-${col.ColumnName}`,
-        name: `${col.ColumnName} (${col.DataType})`,
+        name: `${col.ColumnName}`,
+        fullName: `${col.ColumnName} (${col.DataType})`,
         type: 'column',
         children: [],
       };
@@ -90,7 +94,8 @@ function mapSqlSchemaToTreeData(tables: any[]): SqlSchemaTree {
         .filter((fk) => fk.ColumnName === col.ColumnName)
         .map((fk) => ({
           id: `fk-${SchemaName}-${TableName}-${fk.ForeignKeyName}`,
-          name: `${fk.ColumnName} → ${fk.ReferencedTableName}.${fk.ReferencedColumnName}`,
+          name: `${fk.ReferencedTableName}.${fk.ReferencedColumnName}`,
+          fullName: `${fk.ColumnName} → ${fk.ReferencedTableName}.${fk.ReferencedColumnName}`,
           type: 'foreignKey',
         }));
 
@@ -112,15 +117,66 @@ type SqlInspectInputProps = {
   updateConnection: (connection: SqlConnection) => void;
 };
 
+type MousePosition = {
+  mouseX: number;
+  mouseY: number;
+}
+
 const SqlInspectDialog: React.FC<SqlInspectInputProps> = ({
   connection,
   open,
   onClose,
   updateConnection,
 }) => {
+  const [menuPosition, setMenuPosition] = useState<MousePosition | null>(null);
+  const [schema, setSchema] = useState<Schema | null>(null);
+  const [table, setTable] = useState<Table | null>(null);
+  const [column, setColumn] = useState<Column | null>(null);
+  const [fk, setFk] = useState<ForeignKey | null>(null);
+
   const schemas = useMemo(() => {
     return connection?.tables?.length ? mapSqlSchemaToTreeData(connection.tables) : [];
   }, [connection]);
+
+  const getMenuPosition = (event: React.MouseEvent<HTMLLIElement>) => {
+    return menuPosition === null
+      ? { mouseX: event.clientX + 2, mouseY: event.clientY - 6 }
+      : null
+  }
+
+  const handleSchemaContextMenu = (event: React.MouseEvent<HTMLLIElement, MouseEvent>, schema: Schema) => {
+    setMenuPosition(getMenuPosition(event));
+    setSchema(schema);
+  }
+
+  const handleTableContextMenu = (event: React.MouseEvent<HTMLLIElement, MouseEvent>, schema: Schema, table: Table) => {
+    setMenuPosition(getMenuPosition(event));
+    setSchema(schema);
+    setTable(table);
+  }
+
+  const handleColumnContextMenu = (event: React.MouseEvent<HTMLLIElement, MouseEvent>, schema: Schema, table: Table, column: Column) => {
+    setMenuPosition(getMenuPosition(event));
+    setSchema(schema);
+    setTable(table);
+    setColumn(column);
+  }
+
+  const handleFkContextMenu = (event: React.MouseEvent<HTMLLIElement, MouseEvent>, schema: Schema, table: Table, column: Column, fk: ForeignKey) => {
+    setMenuPosition(getMenuPosition(event));
+    setSchema(schema);
+    setTable(table);
+    setColumn(column);
+    setFk(fk);
+  }
+
+  const handleContextMenuClose = () => {
+    setMenuPosition(null);
+    setSchema(null);
+    setTable(null);
+    setColumn(null);
+    setFk(null);
+  }
 
   if (!connection) return null;
 
@@ -130,7 +186,7 @@ const SqlInspectDialog: React.FC<SqlInspectInputProps> = ({
         <DialogTitle>Connection Schema</DialogTitle>
         <DialogContent dividers>
           {connection ? (
-            <Box sx={{ maxWidth: 400, bgcolor: 'background.paper', p: 2 }}>
+            <Box sx={{ bgcolor: 'background.paper', p: 2 }}>
               <Typography variant="h6" gutterBottom>
                 <StorageIcon /> SQL Schema Explorer
               </Typography>
@@ -150,6 +206,7 @@ const SqlInspectDialog: React.FC<SqlInspectInputProps> = ({
               <SimpleTreeView>
                 {schemas.map((schema) => (
                   <TreeItem
+                    onContextMenu={(event) => handleSchemaContextMenu(event, schema)}
                     key={schema.id}
                     itemId={schema.id}
                     label={
@@ -161,6 +218,7 @@ const SqlInspectDialog: React.FC<SqlInspectInputProps> = ({
                   >
                     {schema.children.map((table) => (
                       <TreeItem
+                        onContextMenu={(event) => handleTableContextMenu(event, schema, table)}
                         key={table.id}
                         itemId={table.id}
                         label={
@@ -172,18 +230,20 @@ const SqlInspectDialog: React.FC<SqlInspectInputProps> = ({
                       >
                         {table.children.map((column) => (
                           <TreeItem
+                            onContextMenu={(event) => handleColumnContextMenu(event, schema, table, column)}
                             key={column.id}
                             itemId={column.id}
                             label={
                               <Box display="flex" alignItems="center">
                                 <DnsIcon fontSize="small" sx={{ mr: 1 }} />
-                                {column.name}
+                                {column.fullName}
                               </Box>
                             }
                           >
                             {/* Foreign Keys inside the column */}
                             {column.children.map((fk) => (
                               <TreeItem
+                                onContextMenu={(event) => handleFkContextMenu(event, schema, table, column, fk)}
                                 key={fk.id}
                                 itemId={fk.id}
                                 label={
@@ -212,6 +272,7 @@ const SqlInspectDialog: React.FC<SqlInspectInputProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
+      <ContextMenuComponent mousePosition={menuPosition} onClose={handleContextMenuClose} schema={schema} table={table} column={column} fk={fk} connection={connection} />
     </div>
   );
 };

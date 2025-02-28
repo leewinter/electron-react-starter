@@ -41,6 +41,7 @@ const SqlConnectionIcon: React.FC = () => {
       updatedConnections.push(connection);
 
     setConnections(updatedConnections);
+    setSchemaConnection(connection);
   };
 
   const handleDeleteConnection = (connection: SqlConnection): void => {
