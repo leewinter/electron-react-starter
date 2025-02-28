@@ -88,9 +88,8 @@ Add the following to the file.
 
 ```shell
 set CSC_KEY_PASSWORD=mssql-inspect
-npm run build
-
-electron-builder --win --certificate-file cert/VennersysElectronSelfSignedCert.pfx --certificate-password "the-password-you-set-during-export"
+set CSC_LINK=cert/VennersysElectronSelfSignedCert.pfx
+npx electron-builder --win
 ```
 
 Open cmd or powershell as an admin at the root of the project and run the following.
