@@ -5,11 +5,25 @@ import {
   SqlLintPayload,
   SqlExecutionResponsePayload,
   SqlExecutionRequestPayload,
+  SqlColumn,
 } from '../../../shared/types/data-channel.d';
 import { IpcMainEvent, ipcMain } from 'electron';
 import { format } from 'sql-formatter';
 import { parseSqlConnectionString } from './index';
 import * as mssql from 'mssql';
+
+type MssqlTediousColumn = {
+  index: number;
+  name: string;
+  length: number;
+  type: () => { name: string };
+  scale: number | undefined;
+  precision: number | undefined;
+  nullable: boolean;
+  caseSensitive: boolean;
+  identity: boolean;
+  readOnly: boolean;
+};
 
 export const SqlEventsDictionary = {
   [DataChannel.SQL_LINT]: function (): void {
@@ -51,9 +65,9 @@ export const SqlEventsDictionary = {
 
           const recordset = result.recordset ?? [];
 
-          const columns =
+          const columns: SqlColumn[] =
             Array.isArray(sqlResult?.columns) && Array.isArray(sqlResult.columns[0])
-              ? sqlResult.columns[0].map((col: any) => {
+              ? sqlResult.columns[0].map((col: MssqlTediousColumn) => {
                   return {
                     name: col.name,
                     type: col.type.name,
@@ -61,7 +75,7 @@ export const SqlEventsDictionary = {
                     nullable: col.nullable,
                     precision: col.precision,
                     scale: col.scale,
-                  };
+                  } as SqlColumn;
                 })
               : [];
 

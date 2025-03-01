@@ -1,5 +1,21 @@
-export const parseSqlConnectionString = (connectionString: string): any => {
-  const config: any = {};
+interface SqlConfig {
+  server?: string;
+  port?: number;
+  database?: string;
+  user?: string;
+  password?: string;
+  options?: {
+    trustServerCertificate?: boolean;
+    appName?: string;
+    multipleActiveResultSets?: boolean;
+  };
+  authentication?: {
+    type: string;
+  };
+}
+
+export const parseSqlConnectionString = (connectionString: string): SqlConfig => {
+  const config: SqlConfig = {};
 
   // Split key-value pairs
   const pairs = connectionString.split(';');
