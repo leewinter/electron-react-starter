@@ -9,6 +9,7 @@ module.exports = {
   rules: {
     semi: 'error',
     'linebreak-style': 'off',
+    'react/prop-types': 'disabled',
     'prettier/prettier': [
       'error',
       {

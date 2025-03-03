@@ -9,4 +9,6 @@ export type SqlConnection = {
     sql: string;
     date: Date;
   }>;
+  tables?: Array<any>;
+  lastInspectDate?: Date;
 };

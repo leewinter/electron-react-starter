@@ -4,6 +4,7 @@ export enum DataChannel {
   SQL_CONNECTIONS = 'SQL_CONNECTIONS',
   SQL_LINT = 'SQL_LINT',
   SQL_EXECUTE = 'SQL_EXECUTE',
+  SQL_INSPECT_CONNECTION = 'SQL_INSPECT_CONNECTION',
 }
 
 export enum DataChannelMethod {
@@ -47,4 +48,14 @@ export type SqlExecutionResponsePayload = {
 export type SqlExecutionRequestPayload = {
   sql: string;
   selectedConnection: SqlConnection;
+};
+
+// Inspect
+export type SqlConnectionInspectPayload = {
+  connection: SqlConnection;
+  onLoaded: (connection) => void;
+};
+
+export type SqlConnectionInspectPayload = {
+  connection: SqlConnection;
 };

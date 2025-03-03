@@ -1,6 +1,7 @@
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import PropTypes from 'prop-types';
 
-import { SqlConnection } from '../../shared/types/sql-connection';
+import { SqlConnection } from '../../../shared/types/sql-connection';
 import { useSqlConnections } from '../hooks/use-sql-connections';
 
 type SqlConnectionSelectProps = {
@@ -29,6 +30,22 @@ const SqlConnectionSelect: React.FC<SqlConnectionSelectProps> = ({
       </Select>
     </FormControl>
   );
+};
+SqlConnectionSelect.propTypes = {
+  selectedConnection: PropTypes.shape({
+    connectionId: PropTypes.string.isRequired,
+    connectionName: PropTypes.string.isRequired,
+    connectionString: PropTypes.string.isRequired,
+    queryHistory: PropTypes.arrayOf(
+      PropTypes.shape({
+        rowCountResult: PropTypes.number.isRequired, // Number type
+        queryHistoryItemId: PropTypes.string.isRequired, // String type
+        sql: PropTypes.string.isRequired, // String type
+        date: PropTypes.instanceOf(Date).isRequired, // Date type
+      }),
+    ),
+  }),
+  onChange: PropTypes.func.isRequired,
 };
 
 export default SqlConnectionSelect;
