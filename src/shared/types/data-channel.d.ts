@@ -1,3 +1,4 @@
+import { SqlConnection } from './sql-connection';
 ///
 // Event Payloads
 export enum DataChannel {
@@ -54,8 +55,4 @@ export type SqlExecutionRequestPayload = {
 export type SqlConnectionInspectPayload = {
   connection: SqlConnection;
   onLoaded: (connection) => void;
-};
-
-export type SqlConnectionInspectPayload = {
-  connection: SqlConnection;
 };
