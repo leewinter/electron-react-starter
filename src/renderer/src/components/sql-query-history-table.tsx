@@ -50,8 +50,9 @@ const QueryHistoryTable: React.FC<QueryHistoryProps> = ({ connection }) => {
               <InputLabel id="query-limit-label">Show</InputLabel>
               <Select
                 labelId="query-limit-label"
+                label="Show"
                 value={queryLimit}
-                onChange={e => setQueryLimit(Number(e.target.value))}
+                onChange={(e) => setQueryLimit(Number(e.target.value))}
               >
                 <MenuItem value={5}>Last 5</MenuItem>
                 <MenuItem value={10}>Last 10</MenuItem>
@@ -81,7 +82,7 @@ const QueryHistoryTable: React.FC<QueryHistoryProps> = ({ connection }) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {displayedQueries.map(query => (
+                  {displayedQueries.map((query) => (
                     <TableRow
                       key={query.queryHistoryItemId}
                       onClick={() => setQuery(query.sql)}
