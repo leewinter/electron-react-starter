@@ -7,9 +7,6 @@ import {
   DialogActions,
   Button,
   Typography,
-  Tooltip,
-  Grid2,
-  Paper,
 } from '@mui/material';
 import StorageIcon from '@mui/icons-material/Storage';
 import SqlConnectionForm from './sql-connection-form';
@@ -17,9 +14,7 @@ import SqlConnectionTable from './sql-connection-grid';
 import { type SqlConnection } from '../../../shared/types/sql-connection';
 import { useSqlConnections } from '../hooks/use-sql-connections';
 import SqlInspectDialog from './sql-inspect-dialog';
-
-const truncateText = (text: string, maxLength = 100): string =>
-  text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+import QueryHistoryTable from '../components/sql-query-history-table';
 
 const SqlConnectionIcon: React.FC = () => {
   const [connectionToEdit, setConnectionToEdit] = useState<SqlConnection | undefined>(undefined);
@@ -106,7 +101,7 @@ const SqlConnectionIcon: React.FC = () => {
       </Dialog>
 
       {/* History Dialog */}
-      <Dialog open={historyOpen} onClose={handleHistoryClose} maxWidth="md" fullWidth>
+      <Dialog open={historyOpen} onClose={handleHistoryClose} maxWidth="xl" fullWidth>
         <DialogTitle>Connection History</DialogTitle>
         <DialogContent dividers>
           {historyConnection ? (
@@ -114,30 +109,7 @@ const SqlConnectionIcon: React.FC = () => {
               <Typography variant="subtitle1">
                 Viewing history for: <strong>{historyConnection.connectionName}</strong>
               </Typography>
-              {/* Check if queryHistory exists and has items */}
-              {historyConnection.queryHistory && historyConnection.queryHistory.length > 0 ? (
-                <Grid2 container spacing={2} sx={{ mt: 2 }}>
-                  {historyConnection.queryHistory.map((query, index) => (
-                    <Grid2 size={12} key={index}>
-                      <Paper sx={{ p: 2 }}>
-                        <Typography variant="body1">
-                          <strong>Query:</strong>{' '}
-                          <Tooltip title={query.sql} arrow>
-                            <span>{truncateText(query.sql, 100)}</span>
-                          </Tooltip>
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Rows Affected:</strong> {query.rowCountResult}
-                        </Typography>
-                      </Paper>
-                    </Grid2>
-                  ))}
-                </Grid2>
-              ) : (
-                <Typography variant="body2" sx={{ mt: 2 }}>
-                  No query history available.
-                </Typography>
-              )}
+              <QueryHistoryTable connection={historyConnection} />
             </>
           ) : (
             <Typography>No history available.</Typography>

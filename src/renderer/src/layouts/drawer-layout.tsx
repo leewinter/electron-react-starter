@@ -21,6 +21,7 @@ import StorageIcon from '@mui/icons-material/Storage';
 import { Outlet } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
 import ThemeToggleButton from '../components/theme/toggle-theme-button';
+import SettingsLaunchIcon from '../components/settings/settings-icon';
 
 const drawerWidth = 240;
 
@@ -146,6 +147,7 @@ export default function MiniDrawer(): JSX.Element {
             SQL Inspect
           </Typography>
 
+          <SettingsLaunchIcon />
           <ThemeToggleButton />
         </Toolbar>
       </AppBar>
@@ -170,11 +172,11 @@ export default function MiniDrawer(): JSX.Element {
                 },
                 open
                   ? {
-                    justifyContent: 'initial',
-                  }
+                      justifyContent: 'initial',
+                    }
                   : {
-                    justifyContent: 'center',
-                  },
+                      justifyContent: 'center',
+                    },
               ]}
             >
               <ListItemIcon
@@ -185,11 +187,11 @@ export default function MiniDrawer(): JSX.Element {
                   },
                   open
                     ? {
-                      mr: 3,
-                    }
+                        mr: 3,
+                      }
                     : {
-                      mr: 'auto',
-                    },
+                        mr: 'auto',
+                      },
                 ]}
               >
                 <DashboardIcon />
@@ -199,11 +201,11 @@ export default function MiniDrawer(): JSX.Element {
                 sx={[
                   open
                     ? {
-                      opacity: 1,
-                    }
+                        opacity: 1,
+                      }
                     : {
-                      opacity: 0,
-                    },
+                        opacity: 0,
+                      },
                 ]}
               />
             </ListItemButton>
@@ -220,11 +222,11 @@ export default function MiniDrawer(): JSX.Element {
                 },
                 open
                   ? {
-                    justifyContent: 'initial',
-                  }
+                      justifyContent: 'initial',
+                    }
                   : {
-                    justifyContent: 'center',
-                  },
+                      justifyContent: 'center',
+                    },
               ]}
             >
               <ListItemIcon
@@ -235,11 +237,11 @@ export default function MiniDrawer(): JSX.Element {
                   },
                   open
                     ? {
-                      mr: 3,
-                    }
+                        mr: 3,
+                      }
                     : {
-                      mr: 'auto',
-                    },
+                        mr: 'auto',
+                      },
                 ]}
               >
                 <StorageIcon />
@@ -249,11 +251,11 @@ export default function MiniDrawer(): JSX.Element {
                 sx={[
                   open
                     ? {
-                      opacity: 1,
-                    }
+                        opacity: 1,
+                      }
                     : {
-                      opacity: 0,
-                    },
+                        opacity: 0,
+                      },
                 ]}
               />
             </ListItemButton>
