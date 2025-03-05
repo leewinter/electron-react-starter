@@ -9,9 +9,9 @@ export default function DashboardPage(): JSX.Element {
     <Container sx={{ mt: 3 }} maxWidth={false}>
       <Typography variant="h5">Welcome to MSSQL Inspect</Typography>
       <Grid2 container={true} spacing={2} sx={{ mt: 2 }}>
-        {connections.map(conn => {
+        {connections.map((conn) => {
           return (
-            <Grid2 size={{ xs: 12, md: 6, lg: 6 }} key={conn.connectionId}>
+            <Grid2 size={{ xs: 12, md: 12, lg: 12 }} key={conn.connectionId}>
               <QueryHistoryTable connection={conn} />
             </Grid2>
           );
