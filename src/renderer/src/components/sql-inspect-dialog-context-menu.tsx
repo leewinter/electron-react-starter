@@ -136,7 +136,8 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
         open={queryHistoryOpen}
         onClose={() => setQueryHistoryOpen(false)}
         connection={connection}
-        queryHistoryFilter={(t) => t.sql.includes(`${table?.name}`)}
+        queryHistoryFilter={(t) => t.sql.includes(`${schema?.name}.${table?.name}`)}
+        filterTitle={table?.name}
       />
 
       <SqlDialogQuery
