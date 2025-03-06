@@ -6,6 +6,10 @@ import SqlDialogQuery from './sql-dialog-query';
 import { useAiServices } from '../hooks/use-ai-services';
 import ModalLoader from '../components/shared/modal-loader';
 import { useDeepSeekApiKey } from '../hooks/use-deep-seek-api-key';
+import PsychologyIcon from '@mui/icons-material/Psychology';
+import SqlQueryHistoryDialog from '../components/sql-query-history-dialog';
+import HistoryIcon from '@mui/icons-material/History';
+import TableChartIcon from '@mui/icons-material/TableChart';
 
 type MousePosition = {
   mouseX: number;
@@ -33,6 +37,7 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
 }) => {
   const [query, setQuery] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [queryHistoryOpen, setQueryHistoryOpen] = useState<boolean>(false);
 
   const { getSqlJoins } = useAiServices();
   const { apiKey } = useDeepSeekApiKey();
@@ -88,6 +93,12 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
     setLoading(false);
   };
 
+  const handleViewTableQueryHistory = async () => {
+    if (table) {
+      setQueryHistoryOpen(true);
+    }
+  };
+
   return (
     <>
       <Menu
@@ -102,16 +113,33 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
       >
         <ListSubheader>{breadcrumb}</ListSubheader>
         {table ? (
-          <MenuItem onClick={handleSelectTop10}>
-            Select TOP 10 * FROM {schema?.name}.{table.name}
-          </MenuItem>
+          <>
+            <MenuItem onClick={handleViewTableQueryHistory}>
+              <HistoryIcon fontSize="medium" style={{ marginRight: 8 }} />
+              {schema?.name}.{table.name} Query History
+            </MenuItem>
+            <MenuItem onClick={handleSelectTop10}>
+              <TableChartIcon fontSize="medium" style={{ marginRight: 8 }} />
+              Select TOP 10 * FROM {schema?.name}.{table.name}
+            </MenuItem>
+          </>
         ) : null}
         {hasForeignKeys.length ? (
           <MenuItem onClick={handleGetRelationships}>
-            (AI) Select TOP 10 * FROM [RelatedTables]
+            <PsychologyIcon fontSize="medium" style={{ marginRight: 8 }} />
+            Select TOP 10 * FROM [RelatedTables]
           </MenuItem>
         ) : null}
       </Menu>
+
+      <SqlQueryHistoryDialog
+        open={queryHistoryOpen}
+        onClose={() => setQueryHistoryOpen(false)}
+        connection={connection}
+        queryHistoryFilter={(t) => t.sql.includes(`${schema?.name}.${table?.name}`)}
+        filterTitle={table?.name}
+      />
+
       <SqlDialogQuery
         query={query}
         connection={connection}

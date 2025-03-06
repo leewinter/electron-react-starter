@@ -10,6 +10,7 @@ import {
 import camelCase from 'lodash.camelcase';
 import { useTheme } from '@mui/material/styles';
 import { SqlExecutionResponsePayload } from '../../../shared/types/data-channel.d';
+import Alert from '@mui/material/Alert';
 
 interface ReportGridProps {
   sqlResults: SqlExecutionResponsePayload | undefined;
@@ -79,7 +80,7 @@ type DynamicObject = {
 };
 
 const constructJson = (columns: Array<ColumType>, recordset: Array<any>): Array<DynamicObject> => {
-  const result = recordset.map(row => {
+  const result = recordset.map((row) => {
     const obj: DynamicObject = {};
     columns.forEach((column: ColumType, indexKey: number) => {
       if (['DateTime', 'Date'].includes(column.type) && row[indexKey]) {
@@ -97,7 +98,7 @@ const constructJson = (columns: Array<ColumType>, recordset: Array<any>): Array<
 const getColumnDefinitions = (
   columns: { name: string; camelName: string; type: string; jsType: () => string }[],
 ): any[] => {
-  return columns.map(col => {
+  return columns.map((col) => {
     let definition: any = {
       ...baseColumn,
       headerName: col.name,
@@ -187,6 +188,8 @@ const ReportGrid: React.FC<ReportGridProps> = ({ sqlResults }) => {
     };
   }, [sqlResults]);
 
+  if (!sqlResults) return null;
+
   return (
     <>
       {loading && 'loading...'}
@@ -196,7 +199,8 @@ const ReportGrid: React.FC<ReportGridProps> = ({ sqlResults }) => {
             className={`header-panel ${columnDefinitions.length === 0 ? 'bg-primary-warning' : 'bg-primary-default'}`}
           >
             <p className="text-2xl text-white">
-              {columnDefinitions.length === 0 ? '' : 'No Data Found'}
+              {sqlResults.error ? <Alert severity="error">{sqlResults.error}</Alert> : null}
+              {sqlResults.error || columnDefinitions.length === 0 ? '' : 'No Data Found'}
             </p>
           </div>
         </div>
