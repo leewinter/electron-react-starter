@@ -1,11 +1,38 @@
 import './events';
 
-import { BrowserWindow, app, ipcMain, shell } from 'electron';
+import { BrowserWindow, app, ipcMain, shell, protocol } from 'electron';
 import { electronApp, is, optimizer } from '@electron-toolkit/utils';
 
 import icon from '../../resources/icon.png?asset';
 import { join } from 'path';
 import { HandlerDetails } from 'electron/main';
+import { AssetUrl } from './protocols/asset-url';
+import { AssetServer } from './protocols/asset-server';
+
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'app-asset',
+    privileges: {
+      standard: true,
+      supportFetchAPI: true,
+      bypassCSP: true,
+    },
+  },
+]);
+
+const server = new AssetServer();
+
+app.whenReady().then(() => {
+  protocol.handle('app-asset', (request) => {
+    const asset = new AssetUrl(request.url);
+
+    if (asset.isNodeModule) {
+      return server.fromNodeModules(asset.relativeUrl);
+    } else {
+      return server.fromPublic(asset.relativeUrl);
+    }
+  });
+});
 
 function createWindow(): void {
   // Create the browser window.

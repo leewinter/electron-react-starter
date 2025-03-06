@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import CodeEditor from '@uiw/react-textarea-code-editor';
 import { useEventChannel } from '../hooks/use-event-channel';
 import {
   type EventRequest,
@@ -10,7 +9,8 @@ import {
 } from '../../../shared/types/data-channel.d';
 import { IconButton, Tooltip } from '@mui/material';
 import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
-
+import Editor from '@monaco-editor/react';
+import { useSqlIntellisense } from './editor/hooks/use-sql-intellisense';
 import { useTheme } from '@mui/material/styles';
 
 const SqlEditor: React.FC<{
@@ -20,6 +20,7 @@ const SqlEditor: React.FC<{
   const [currentCode, setCurrentCode] = useState<string | undefined>(code);
   const [codeDirty, setCodeDirty] = useState(true);
   const theme = useTheme();
+  useSqlIntellisense();
 
   const { sendMessage, onMessage, removeListener } = useEventChannel({
     channel: DataChannel.SQL_LINT,
@@ -56,21 +57,25 @@ const SqlEditor: React.FC<{
           <FormatAlignLeftIcon />
         </IconButton>
       </Tooltip>
-      <CodeEditor
+      <Editor
+        theme={theme.palette.mode === 'dark' ? 'vs-dark' : 'vs'}
+        height="400px"
+        defaultLanguage="sql"
         value={currentCode}
-        language="sql"
-        placeholder="Write your SQL query here..."
-        onChange={(evn: React.ChangeEvent<HTMLTextAreaElement>): void => {
-          setCurrentCode(evn.target.value);
-          onChange(evn.target.value);
+        defaultValue={currentCode}
+        onChange={(value): void => {
+          setCurrentCode(value);
+          onChange(value ?? '');
           setCodeDirty(true);
         }}
-        padding={15}
-        style={{ fontSize: 14, backgroundColor: theme.palette.grey[50], fontFamily: 'monospace' }}
+        options={{
+          fontSize: 14,
+          minimap: { enabled: false },
+          automaticLayout: true,
+          suggestOnTriggerCharacters: true,
+          quickSuggestions: true,
+        }}
       />
-      {/* <div style={{ color: errors.includes('✅') ? 'green' : 'red', marginTop: '10px' }}>
-        {errors}
-      </div> */}
     </div>
   );
 };
