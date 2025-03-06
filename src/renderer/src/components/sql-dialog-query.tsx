@@ -11,6 +11,8 @@ interface SqlDialogQueryProps {
 }
 
 const SqlDialogQuery: React.FC<SqlDialogQueryProps> = ({ open, onClose, query, connection }) => {
+  // if (!connection?.connectionId) return null;
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xl" fullWidth>
       <DialogTitle>SQL Query</DialogTitle>

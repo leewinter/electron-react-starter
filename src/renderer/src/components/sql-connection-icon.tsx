@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  Typography,
 } from '@mui/material';
 import StorageIcon from '@mui/icons-material/Storage';
 import SqlConnectionForm from './sql-connection-form';
@@ -14,7 +13,7 @@ import SqlConnectionTable from './sql-connection-grid';
 import { type SqlConnection } from '../../../shared/types/sql-connection';
 import { useSqlConnections } from '../hooks/use-sql-connections';
 import SqlInspectDialog from './sql-inspect-dialog';
-import QueryHistoryTable from '../components/sql-query-history-table';
+import SqlQueryHistoryDialog from '../components/sql-query-history-dialog';
 
 const SqlConnectionIcon: React.FC = () => {
   const [connectionToEdit, setConnectionToEdit] = useState<SqlConnection | undefined>(undefined);
@@ -100,27 +99,14 @@ const SqlConnectionIcon: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* History Dialog */}
-      <Dialog open={historyOpen} onClose={handleHistoryClose} maxWidth="xl" fullWidth>
-        <DialogTitle>Connection History</DialogTitle>
-        <DialogContent dividers>
-          {historyConnection ? (
-            <>
-              <Typography variant="subtitle1">
-                Viewing history for: <strong>{historyConnection.connectionName}</strong>
-              </Typography>
-              <QueryHistoryTable connection={historyConnection} />
-            </>
-          ) : (
-            <Typography>No history available.</Typography>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleHistoryClose} color="primary" variant="contained">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {historyConnection && (
+        <SqlQueryHistoryDialog
+          open={historyOpen}
+          onClose={handleHistoryClose}
+          connection={historyConnection}
+        />
+      )}
+
       <SqlInspectDialog
         open={Boolean(schemaConnection)}
         connection={schemaConnection}
