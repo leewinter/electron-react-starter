@@ -10,10 +10,10 @@ import {
 import StorageIcon from '@mui/icons-material/Storage';
 import SqlConnectionForm from './sql-connection-form';
 import SqlConnectionTable from './sql-connection-grid';
-import { type SqlConnection } from '../../../shared/types/sql-connection';
-import { useSqlConnections } from '../hooks/use-sql-connections';
-import SqlInspectDialog from './sql-inspect-dialog';
-import SqlQueryHistoryDialog from '../components/sql-query-history-dialog';
+import { type SqlConnection } from '../../../../shared/types/sql-connection';
+import { useSqlConnections } from '../../hooks/use-sql-connections';
+import SqlInspectDialog from '../sql-inspect-dialog';
+import SqlQueryHistoryDialog from '../sql-query-history-dialog';
 
 const SqlConnectionIcon: React.FC = () => {
   const [connectionToEdit, setConnectionToEdit] = useState<SqlConnection | undefined>(undefined);
