@@ -6,25 +6,25 @@ import {
   Container,
   Typography,
 } from '@mui/material';
-import { SqlConnection } from '../../../shared/types/sql-connection';
 import {
+  DataChannel,
   EventRequest,
   EventResponse,
-  DataChannel,
   SqlExecutionRequestPayload,
   SqlExecutionResponsePayload,
 } from '../../../shared/types/data-channel.d';
-import { useState } from 'react';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import PropTypes from 'prop-types';
 import ReportGrid from '../components/sql-result-grid';
-import SqlCodeEditor from '../components/sql-code-editor';
+import SqlCodeEditor from './editor/sql-code-editor';
+import { SqlConnection } from '../../../shared/types/sql-connection';
 import SqlConnectionIcon from '../components/sql-connection-icon';
 import SqlConnectionSelect from '../components/sql-connection-select';
 import { Stack } from '@mui/material';
 import { useEventChannel } from '../hooks/use-event-channel';
 import { useSqlConnections } from '../hooks/use-sql-connections';
-import PropTypes from 'prop-types';
+import { useState } from 'react';
 
 export default function SqlQueryComponent({ query, connection }): JSX.Element {
   const [selectedConnection, setSelectedConnection] = useState<SqlConnection | null>(

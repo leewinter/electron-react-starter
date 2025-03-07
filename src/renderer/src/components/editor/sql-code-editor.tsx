@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useEventChannel } from '../hooks/use-event-channel';
+import { useEventChannel } from '../../hooks/use-event-channel';
 import {
   type EventRequest,
   type EventResponse,
   DataChannel,
   SqlLintPayload,
-} from '../../../shared/types/data-channel.d';
+} from '../../../../shared/types/data-channel.d';
 import { IconButton, Tooltip } from '@mui/material';
 import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
 import Editor from '@monaco-editor/react';
-import { useSqlIntellisense } from './editor/hooks/use-sql-intellisense';
+import { useSqlIntellisense } from './hooks/use-sql-intellisense';
 import { useTheme } from '@mui/material/styles';
 
 const SqlEditor: React.FC<{
