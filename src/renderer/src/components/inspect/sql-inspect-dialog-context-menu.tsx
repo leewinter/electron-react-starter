@@ -58,8 +58,12 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
     if (onClose) onClose();
   };
 
+  const getColumnList = () => {
+    return table?.children.map((col) => `[${col.name}]`).join(', ');
+  };
+
   const handleSelectTop10 = () => {
-    const columnList = table?.children.map((col) => `[${col.name}]`).join(', ');
+    const columnList = getColumnList();
     setQuery(`Select TOP 10 ${columnList} FROM ${schema?.name}.${table?.name}`);
     handleClose();
   };
@@ -75,7 +79,7 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
     const foreignKeys = columnsWithForeignKeys?.flatMap((n) =>
       n.children.filter((c) => c.type === 'foreignKey'),
     );
-    const columnList = table?.children.map((col) => col.name).join(', ');
+    const columnList = getColumnList();
 
     const sqlPrompt = `I need this table:-
       Select TOP 10 ${columnList} FROM ${schema?.name}.${table?.name}
