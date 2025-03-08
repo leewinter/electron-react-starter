@@ -2,12 +2,12 @@ import { useMemo, useState } from 'react';
 import { Menu, MenuItem, ListSubheader } from '@mui/material';
 import { Schema, Table, Column, ForeignKey } from './sql-inspect-dialog';
 import { SqlConnection } from 'src/shared/types/sql-connection';
-import SqlDialogQuery from './sql-dialog-query';
-import { useAiServices } from '../hooks/use-ai-services';
-import ModalLoader from '../components/shared/modal-loader';
-import { useDeepSeekApiKey } from '../hooks/use-deep-seek-api-key';
+import SqlDialogQuery from '../query/sql-dialog-query';
+import { useAiServices } from '../../hooks/use-ai-services';
+import ModalLoader from '../shared/modal-loader';
+import { useDeepSeekApiKey } from '../../hooks/use-deep-seek-api-key';
 import PsychologyIcon from '@mui/icons-material/Psychology';
-import SqlQueryHistoryDialog from '../components/sql-query-history-dialog';
+import SqlQueryHistoryDialog from '../query/sql-query-history-dialog';
 import HistoryIcon from '@mui/icons-material/History';
 import TableChartIcon from '@mui/icons-material/TableChart';
 

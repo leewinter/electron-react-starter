@@ -1,7 +1,7 @@
 import Typography from '@mui/material/Typography';
 import { Container, Grid2 } from '@mui/material';
 import { useSqlConnections } from '../hooks/use-sql-connections';
-import QueryHistoryTable from '../components/sql-query-history-table';
+import QueryHistoryTable from '../components/query/sql-query-history-table';
 
 export default function DashboardPage(): JSX.Element {
   const { connections } = useSqlConnections();

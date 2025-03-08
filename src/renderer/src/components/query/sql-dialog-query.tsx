@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import SqlQueryComponent from './sql-query-component';
-import { SqlConnection } from '../../../shared/types/sql-connection'; // Adjust the import path as necessary
+import { SqlConnection } from '../../../../shared/types/sql-connection'; // Adjust the import path as necessary
 
 interface SqlDialogQueryProps {
   open: boolean; // Controls dialog visibility

@@ -17,7 +17,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import { SqlConnection, QueryHistory } from '../../../shared/types/sql-connection';
+import { SqlConnection, QueryHistory } from '../../../../shared/types/sql-connection';
 import SqlDialogQuery from './sql-dialog-query';
 
 interface QueryHistoryProps {

@@ -9,7 +9,7 @@ import {
 } from '@mui/x-data-grid';
 import camelCase from 'lodash.camelcase';
 import { useTheme } from '@mui/material/styles';
-import { SqlExecutionResponsePayload } from '../../../shared/types/data-channel.d';
+import { SqlExecutionResponsePayload } from '../../../../shared/types/data-channel';
 import Alert from '@mui/material/Alert';
 
 interface ReportGridProps {
@@ -199,9 +199,9 @@ const ReportGrid: React.FC<ReportGridProps> = ({ sqlResults }) => {
             className={`header-panel ${columnDefinitions.length === 0 ? 'bg-primary-warning' : 'bg-primary-default'}`}
           >
             <p className="text-2xl text-white">
-              {sqlResults.error ? <Alert severity="error">{sqlResults.error}</Alert> : null}
               {sqlResults.error || columnDefinitions.length === 0 ? '' : 'No Data Found'}
             </p>
+            {sqlResults.error ? <Alert severity="error">{sqlResults.error}</Alert> : null}
           </div>
         </div>
       )}
