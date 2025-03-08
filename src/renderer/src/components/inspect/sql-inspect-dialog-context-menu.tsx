@@ -59,7 +59,7 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
   };
 
   const handleSelectTop10 = () => {
-    const columnList = table?.children.map((col) => col.name).join(', ');
+    const columnList = table?.children.map((col) => `[${col.name}]`).join(', ');
     setQuery(`Select TOP 10 ${columnList} FROM ${schema?.name}.${table?.name}`);
     handleClose();
   };
