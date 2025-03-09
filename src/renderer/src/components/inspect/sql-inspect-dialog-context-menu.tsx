@@ -10,6 +10,8 @@ import PsychologyIcon from '@mui/icons-material/Psychology';
 import SqlQueryHistoryDialog from '../query/sql-query-history-dialog';
 import HistoryIcon from '@mui/icons-material/History';
 import TableChartIcon from '@mui/icons-material/TableChart';
+import { getSqlBasePrompt } from '../../services/deep-seek';
+import SqlPromptDialog from '../ai/sql-prompt-dialog';
 
 type MousePosition = {
   mouseX: number;
@@ -38,6 +40,7 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
   const [query, setQuery] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [queryHistoryOpen, setQueryHistoryOpen] = useState<boolean>(false);
+  const [sqlPrompt, setSqlPrompt] = useState<string | null>(null);
 
   const { getSqlJoins } = useAiServices();
   const { apiKey } = useDeepSeekApiKey();
@@ -81,19 +84,23 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
     );
     const columnList = getColumnList();
 
-    const sqlPrompt = `I need this table:-
+    const sqlPrompt = getSqlBasePrompt(`I need this table:-
       Select TOP 10 ${columnList} FROM ${schema?.name}.${table?.name}
 
       joining to these:-
       ${foreignKeys?.map((fk) => `${fk.referencedTable} ON ${fk.fullName}`).join(', ')}
 
       where possible can a left join be used to the main table so I get rows regardless of the relationships existing
-    `;
+    `);
+
+    setSqlPrompt(sqlPrompt);
+    handleClose();
+  };
+
+  const handleFetchSqlPrompt = async () => {
     setLoading(true);
     const aiResult = await getSqlJoins(sqlPrompt, apiKey);
-
     setQuery(aiResult || null);
-    handleClose();
     setLoading(false);
   };
 
@@ -152,6 +159,14 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
           setQuery(null);
         }}
       />
+
+      <SqlPromptDialog
+        open={Boolean(sqlPrompt)}
+        onClose={() => setSqlPrompt(null)}
+        sqlPrompt={sqlPrompt}
+        onSubmit={handleFetchSqlPrompt}
+      />
+
       <ModalLoader open={loading} />
     </>
   );
