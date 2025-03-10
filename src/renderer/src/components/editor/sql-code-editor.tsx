@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useEventChannel } from '../../hooks/use-event-channel';
 import {
@@ -9,18 +9,21 @@ import {
 } from '../../../../shared/types/data-channel.d';
 import { IconButton, Tooltip } from '@mui/material';
 import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
-import Editor from '@monaco-editor/react';
+import MonacoEditor from '@monaco-editor/react';
 import { useSqlIntellisense } from './hooks/use-sql-intellisense';
 import { useTheme } from '@mui/material/styles';
 
 const SqlEditor: React.FC<{
   code: string | undefined;
+  additionalSuggestions: any;
   onChange: (updatedValue: string) => void;
-}> = ({ code, onChange }) => {
+}> = ({ code, additionalSuggestions, onChange }) => {
   const [currentCode, setCurrentCode] = useState<string | undefined>(code);
   const [codeDirty, setCodeDirty] = useState(true);
+  const editorRef = useRef();
   const theme = useTheme();
-  useSqlIntellisense();
+
+  useSqlIntellisense({ additionalSuggestions, editorRef });
 
   const { sendMessage, onMessage, removeListener } = useEventChannel({
     channel: DataChannel.SQL_LINT,
@@ -44,6 +47,11 @@ const SqlEditor: React.FC<{
     });
   };
 
+  const onEditorDidMount = (editor, monaco): void => {
+    editorRef.current = editor;
+    editor.focus();
+  };
+
   return (
     <div>
       <Tooltip title="Format SQL">
@@ -57,7 +65,7 @@ const SqlEditor: React.FC<{
           <FormatAlignLeftIcon />
         </IconButton>
       </Tooltip>
-      <Editor
+      <MonacoEditor
         theme={theme.palette.mode === 'dark' ? 'vs-dark' : 'vs'}
         height="400px"
         defaultLanguage="sql"
@@ -75,6 +83,7 @@ const SqlEditor: React.FC<{
           suggestOnTriggerCharacters: true,
           quickSuggestions: true,
         }}
+        onMount={onEditorDidMount}
       />
     </div>
   );
