@@ -12,11 +12,11 @@ export interface DeepSeekResponse {
 }
 
 export const getSqlBasePrompt = (queryDescription) => `
-Generate only a valid SQL query without explanation, using ANSI SQL syntax.
-Ensure it joins the necessary tables and includes proper WHERE conditions.
-Return only the SQL code snippet.
+-- Generate only a valid SQL query without explanation, using ANSI SQL syntax.
+-- Ensure it joins the necessary tables and includes proper WHERE conditions.
+-- Return only the SQL code snippet.
 
-Description: ${queryDescription}
+-- Description: ${queryDescription}
 `;
 
 export class DeepSeekApi {

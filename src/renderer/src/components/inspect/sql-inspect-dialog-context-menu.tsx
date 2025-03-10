@@ -85,12 +85,12 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
     const columnList = getColumnList();
 
     const sqlPrompt = getSqlBasePrompt(`I need this table:-
-      Select TOP 10 ${columnList} FROM ${schema?.name}.${table?.name}
+Select TOP 10 ${columnList} FROM ${schema?.name}.${table?.name}
 
-      joining to these:-
-      ${foreignKeys?.map((fk) => `${fk.referencedTable} ON ${fk.fullName}`).join(', ')}
+-- joining to these:-
+-- ${foreignKeys?.map((fk) => `${fk.referencedTable} ON ${fk.fullName}`).join(', ')}
 
-      where possible can a left join be used to the main table so I get rows regardless of the relationships existing
+-- where possible can a left join be used to the main table so I get rows regardless of the relationships existing
     `);
 
     setSqlPrompt(sqlPrompt);

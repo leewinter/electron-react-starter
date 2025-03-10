@@ -17,7 +17,7 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import PropTypes from 'prop-types';
 import ReportGrid from '../results/sql-result-grid';
-import SqlCodeEditor from '../editor/sql-code-editor';
+import SqlEditor from '../editor/sql-code-editor';
 import { SqlConnection } from '../../../../shared/types/sql-connection';
 import SqlConnectionIcon from '../connection/sql-connection-icon';
 import SqlConnectionSelect from '../connection/sql-connection-select';
@@ -125,11 +125,7 @@ export default function SqlQueryComponent({ query, connection }): JSX.Element {
           <Typography variant="h6">SQL Query Editor</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <SqlCodeEditor
-            code={code}
-            onChange={setCode}
-            additionalSuggestions={additionalSuggestions}
-          />
+          <SqlEditor code={code} onChange={setCode} additionalSuggestions={additionalSuggestions} />
           <Button
             variant="contained"
             sx={{ mt: 2 }}
