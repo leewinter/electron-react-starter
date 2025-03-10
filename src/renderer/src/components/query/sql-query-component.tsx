@@ -6,25 +6,26 @@ import {
   Container,
   Typography,
 } from '@mui/material';
-import { SqlConnection } from '../../../shared/types/sql-connection';
 import {
+  DataChannel,
   EventRequest,
   EventResponse,
-  DataChannel,
   SqlExecutionRequestPayload,
   SqlExecutionResponsePayload,
-} from '../../../shared/types/data-channel.d';
-import { useState } from 'react';
+} from '../../../../shared/types/data-channel.d';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ReportGrid from '../components/sql-result-grid';
-import SqlCodeEditor from '../components/sql-code-editor';
-import SqlConnectionIcon from '../components/sql-connection-icon';
-import SqlConnectionSelect from '../components/sql-connection-select';
-import { Stack } from '@mui/material';
-import { useEventChannel } from '../hooks/use-event-channel';
-import { useSqlConnections } from '../hooks/use-sql-connections';
 import PropTypes from 'prop-types';
+import ReportGrid from '../results/sql-result-grid';
+import SqlCodeEditor from '../editor/sql-code-editor';
+import { SqlConnection } from '../../../../shared/types/sql-connection';
+import SqlConnectionIcon from '../connection/sql-connection-icon';
+import SqlConnectionSelect from '../connection/sql-connection-select';
+import { Stack } from '@mui/material';
+import { useEventChannel } from '../../hooks/use-event-channel';
+import { useSqlConnections } from '../../hooks/use-sql-connections';
+import { useMemo, useState } from 'react';
+import { useMonaco } from '@monaco-editor/react';
 
 export default function SqlQueryComponent({ query, connection }): JSX.Element {
   const [selectedConnection, setSelectedConnection] = useState<SqlConnection | null>(
@@ -34,34 +35,69 @@ export default function SqlQueryComponent({ query, connection }): JSX.Element {
   const [sqlResults, setSqlResults] = useState<SqlExecutionResponsePayload>();
   const [isEditorExpanded, setIsEditorExpanded] = useState(true);
   const [isResultsExpanded, setIsResultsExpanded] = useState(false);
+  const monaco = useMonaco();
 
   const { connections, setConnections } = useSqlConnections();
   const { sendMessage, onMessage, removeListener } = useEventChannel({
     channel: DataChannel.SQL_EXECUTE,
   });
 
+  const additionalSuggestions = useMemo(() => {
+    if (selectedConnection && selectedConnection.tables) {
+      const suggestions = selectedConnection.tables.map((t) => {
+        return {
+          label: `${t.TableName} (${t.SchemaName})`,
+          kind: monaco?.languages.CompletionItemKind.Class,
+          insertText: `${t.SchemaName}.${t.TableName}`,
+          documentation: `Table containing ${t.TableName}`,
+          range: null,
+        };
+      });
+      return suggestions;
+    } else return [];
+  }, [selectedConnection]);
+
   const handleUpdateConnectionHistory = (
     selectedConnection: SqlConnection,
     code: string,
-    payload: { recordset: Array<Array<Record<string, unknown>>> },
+    payload: SqlExecutionResponsePayload,
   ): void => {
     const updated = connections.map((c: SqlConnection) =>
       c.connectionId === selectedConnection.connectionId
         ? {
-          ...selectedConnection,
-          queryHistory: [
-            ...(selectedConnection.queryHistory || []),
-            {
-              rowCountResult: payload.recordset.length,
-              queryHistoryItemId: crypto.randomUUID(),
-              sql: code,
-              date: new Date(),
-            },
-          ],
-        }
+            ...selectedConnection,
+            queryHistory: [
+              ...(selectedConnection.queryHistory || []),
+              {
+                rowCountResult: payload.recordset.length,
+                queryHistoryItemId: crypto.randomUUID(),
+                sql: code,
+                date: new Date(),
+              },
+            ],
+          }
         : c,
     );
     setConnections(updated);
+  };
+
+  const handleExecuteSqlClick = (): void => {
+    sendMessage({
+      channel: DataChannel.SQL_EXECUTE,
+      payload: { sql: code, selectedConnection },
+    } as EventRequest<SqlExecutionRequestPayload>);
+
+    onMessage((response: EventResponse<SqlExecutionResponsePayload>) => {
+      setSqlResults(response.payload);
+      removeListener();
+
+      // Minimize editor and expand results
+      setIsEditorExpanded(false);
+      setIsResultsExpanded(true);
+      if (selectedConnection) {
+        handleUpdateConnectionHistory(selectedConnection, code, response.payload);
+      }
+    });
   };
 
   return (
@@ -89,29 +125,16 @@ export default function SqlQueryComponent({ query, connection }): JSX.Element {
           <Typography variant="h6">SQL Query Editor</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <SqlCodeEditor code={code} onChange={setCode} />
+          <SqlCodeEditor
+            code={code}
+            onChange={setCode}
+            additionalSuggestions={additionalSuggestions}
+          />
           <Button
             variant="contained"
             sx={{ mt: 2 }}
             disabled={!selectedConnection || !code}
-            onClick={(): void => {
-              sendMessage({
-                channel: DataChannel.SQL_EXECUTE,
-                payload: { sql: code, selectedConnection },
-              } as EventRequest<SqlExecutionRequestPayload>);
-
-              onMessage((response: EventResponse<SqlExecutionResponsePayload>) => {
-                setSqlResults(response.payload);
-                removeListener();
-
-                // Minimize editor and expand results
-                setIsEditorExpanded(false);
-                setIsResultsExpanded(true);
-                if (selectedConnection) {
-                  handleUpdateConnectionHistory(selectedConnection, code, response.payload);
-                }
-              });
-            }}
+            onClick={handleExecuteSqlClick}
           >
             Execute
           </Button>
