@@ -1,23 +1,25 @@
-import React, { useMemo, useState } from 'react';
-import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
-import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import {
   Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Typography,
 } from '@mui/material';
-import SchemaIcon from '@mui/icons-material/Schema';
-import TableChartIcon from '@mui/icons-material/TableChart';
+import React, { useMemo, useState } from 'react';
+
+import ContextMenuComponent from './sql-inspect-dialog-context-menu';
 import DnsIcon from '@mui/icons-material/Dns'; // Column Icon
 import LinkIcon from '@mui/icons-material/Link'; // Foreign Key Icon
-import StorageIcon from '@mui/icons-material/Storage'; // Database Icon
+import SchemaIcon from '@mui/icons-material/Schema';
+import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { SqlConnection } from 'src/shared/types/sql-connection';
-import SqlConnectionInspect from './sql-connection-inspect';
-import ContextMenuComponent from './sql-inspect-dialog-context-menu';
+import SqlConnectionInspect from '../connection/sql-connection-inspect';
+import StorageIcon from '@mui/icons-material/Storage'; // Database Icon
+import TableChartIcon from '@mui/icons-material/TableChart';
+import { TreeItem } from '@mui/x-tree-view/TreeItem';
+import { useTheme } from '@mui/material/styles';
 
 // Represents a single Foreign Key reference
 export interface ForeignKey {
@@ -26,6 +28,7 @@ export interface ForeignKey {
   fullName: string;
   referencedTable: string;
   type: 'foreignKey';
+  foreignTable?: Table;
 }
 
 // Represents a single column, which may contain foreign keys as children
@@ -33,6 +36,7 @@ export interface Column {
   id: string;
   name: string; // e.g., "SurveyId (int)"
   fullName: string;
+  dataType: string;
   type: 'column';
   children: ForeignKey[]; // Foreign keys mapped under their respective column
 }
@@ -58,11 +62,14 @@ export type SqlSchemaTree = Schema[];
 
 function mapSqlSchemaToTreeData(tables: any[]): SqlSchemaTree {
   const schemaMap: Record<string, Schema> = {};
+  const tableMap: Record<string, Table> = {}; // Store references to tables
+  const pendingForeignKeys: { fk: ForeignKey; referencedTableKey: string }[] = [];
 
+  // **First Pass: Create all schemas and tables**
   tables.forEach((table) => {
-    const { SchemaName, TableName, columns, foreignKeys } = table;
+    const { SchemaName, TableName, columns } = table;
 
-    // If the schema doesn't exist, create it
+    // Ensure the schema exists
     if (!schemaMap[SchemaName]) {
       schemaMap[SchemaName] = {
         id: `schema-${SchemaName}`,
@@ -80,37 +87,64 @@ function mapSqlSchemaToTreeData(tables: any[]): SqlSchemaTree {
       children: [],
     };
 
-    // Add columns and nest foreign keys under their respective columns
+    // Store the table reference in the tableMap
+    const tableKey = `${SchemaName}.${TableName}`;
+    tableMap[tableKey] = tableNode;
+
+    // Add the table node to the schema
+    schemaMap[SchemaName].children.push(tableNode);
+  });
+
+  // **Second Pass: Add columns and foreign keys**
+  tables.forEach((table) => {
+    const { SchemaName, TableName, columns, foreignKeys } = table;
+    const tableNode = tableMap[`${SchemaName}.${TableName}`];
+
     tableNode.children = columns.map((col): Column => {
       const colNode: Column = {
         id: `col-${SchemaName}-${TableName}-${col.ColumnName}`,
-        name: `${col.ColumnName}`,
+        name: col.ColumnName,
+        dataType: col.DataType,
         fullName: `${col.ColumnName} (${col.DataType})`,
         type: 'column',
         children: [],
       };
 
       // Find foreign keys related to this column
-      const relatedForeignKeys: ForeignKey[] = (foreignKeys || [])
-        .filter((fk) => fk.ColumnName === col.ColumnName)
-        .map((fk) => ({
+      const relatedForeignKeys: ForeignKey[] = (foreignKeys || []).filter(
+        (fk) => fk.ColumnName === col.ColumnName
+      ).map((fk) => {
+        const referencedTableKey = `${fk.ReferencedSchemaName}.${fk.ReferencedTableName}`;
+
+        const foreignKey: ForeignKey = {
           id: `fk-${SchemaName}-${TableName}-${fk.ForeignKeyName}`,
           name: `${fk.ReferencedTableName}.${fk.ReferencedColumnName}`,
-          fullName: `${fk.ColumnName} → ${fk.ReferencedTableName}.${fk.ReferencedColumnName}`,
-          referencedTable: `${fk.ReferencedSchemaName}.${fk.ReferencedTableName}`,
+          fullName: `${fk.ColumnName} → ${fk.ReferencedSchemaName}.${fk.ReferencedTableName}.${fk.ReferencedColumnName}`,
+          referencedTable: referencedTableKey,
           type: 'foreignKey',
-        }));
+          foreignTable: tableMap[referencedTableKey] || null, // Try to find the referenced table
+        };
+
+        if (!foreignKey.foreignTable) {
+          pendingForeignKeys.push({ fk: foreignKey, referencedTableKey });
+        }
+
+        return foreignKey;
+      });
 
       colNode.children = relatedForeignKeys;
       return colNode;
     });
+  });
 
-    // Add the table node to the schema
-    schemaMap[SchemaName].children.push(tableNode);
+  // **Final Pass: Resolve pending foreign keys**
+  pendingForeignKeys.forEach(({ fk, referencedTableKey }) => {
+    fk.foreignTable = tableMap[referencedTableKey] || null;
   });
 
   return Object.values(schemaMap);
 }
+
 
 type SqlInspectInputProps = {
   connection: SqlConnection | null;
@@ -135,6 +169,7 @@ const SqlInspectDialog: React.FC<SqlInspectInputProps> = ({
   const [table, setTable] = useState<Table | null>(null);
   const [column, setColumn] = useState<Column | null>(null);
   const [fk, setFk] = useState<ForeignKey | null>(null);
+  const theme = useTheme();
 
   const schemas = useMemo(() => {
     return connection?.tables?.length ? mapSqlSchemaToTreeData(connection.tables) : [];
@@ -227,6 +262,7 @@ const SqlInspectDialog: React.FC<SqlInspectInputProps> = ({
                     onContextMenu={(event) => handleSchemaContextMenu(event, schema)}
                     key={schema.id}
                     itemId={schema.id}
+                    sx={{ color: theme.palette.secondary.main }}
                     label={
                       <Box display="flex" alignItems="center">
                         <SchemaIcon fontSize="small" sx={{ mr: 1 }} />
@@ -239,6 +275,7 @@ const SqlInspectDialog: React.FC<SqlInspectInputProps> = ({
                         onContextMenu={(event) => handleTableContextMenu(event, schema, table)}
                         key={table.id}
                         itemId={table.id}
+                        sx={{ color: theme.palette.primary.main }}
                         label={
                           <Box display="flex" alignItems="center">
                             <TableChartIcon fontSize="small" sx={{ mr: 1 }} />
@@ -253,10 +290,17 @@ const SqlInspectDialog: React.FC<SqlInspectInputProps> = ({
                             }
                             key={column.id}
                             itemId={column.id}
+                            sx={{ color: theme.palette.text.primary }}
                             label={
                               <Box display="flex" alignItems="center">
                                 <DnsIcon fontSize="small" sx={{ mr: 1 }} />
-                                {column.fullName}
+                                {column.name}
+                                <Box
+                                  display="flex"
+                                  sx={{ ml: 1, color: theme.palette.secondary.dark }}
+                                >
+                                  ({column.dataType})
+                                </Box>
                               </Box>
                             }
                           >
@@ -268,9 +312,10 @@ const SqlInspectDialog: React.FC<SqlInspectInputProps> = ({
                                 }
                                 key={fk.id}
                                 itemId={fk.id}
+                                sx={{ color: theme.palette.info.main }}
                                 label={
                                   <Box display="flex" alignItems="center">
-                                    <LinkIcon fontSize="small" sx={{ mr: 1, color: 'blue' }} />
+                                    <LinkIcon fontSize="small" sx={{ mr: 1 }} />
                                     {fk.name}
                                   </Box>
                                 }
