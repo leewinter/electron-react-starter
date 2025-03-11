@@ -98,12 +98,17 @@ export const SqlEventsDictionary = {
 
           const generatedResponsePayload = {
             channel: DataChannel.SQL_EXECUTE,
-            payload: { recordset, columns },
+            payload: { recordset, columns, error: null },
           } as EventResponse<SqlExecutionResponsePayload>;
 
           event.reply(`${DataChannel.SQL_EXECUTE}-response`, generatedResponsePayload);
-        } catch (error) {
+        } catch (error: any) {
           console.error(error);
+          const generatedResponsePayload = {
+            channel: DataChannel.SQL_EXECUTE,
+            payload: { recordset: [], columns: [], error: error.message },
+          } as EventResponse<SqlExecutionResponsePayload>;
+          event.reply(`${DataChannel.SQL_EXECUTE}-response`, generatedResponsePayload);
         }
       },
     );
