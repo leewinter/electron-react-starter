@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Menu, MenuItem, ListSubheader } from '@mui/material';
-import { Schema, Table, Column, ForeignKey } from './sql-inspect-dialog';
+import { Schema, Table, Column, ForeignKey } from './utils/map-sql-schema-to-tree-data';
 import { SqlConnection } from 'src/shared/types/sql-connection';
 import SqlDialogQuery from '../query/sql-dialog-query';
 import { useAiServices } from '../../hooks/use-ai-services';
