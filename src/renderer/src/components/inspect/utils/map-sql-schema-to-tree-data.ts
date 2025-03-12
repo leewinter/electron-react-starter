@@ -44,7 +44,7 @@ export function mapSqlSchemaToTreeData(tables: any[]): SqlSchemaTree {
 
   // **First Pass: Create all schemas and tables**
   tables.forEach((table) => {
-    const { SchemaName, TableName, columns } = table;
+    const { SchemaName, TableName } = table;
 
     // Ensure the schema exists
     if (!schemaMap[SchemaName]) {

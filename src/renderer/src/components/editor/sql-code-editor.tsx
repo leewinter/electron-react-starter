@@ -49,7 +49,7 @@ const SqlEditor: React.FC<{
     });
   };
 
-  const onEditorDidMount = (editor, monaco): void => {
+  const onEditorDidMount = (editor): void => {
     editorRef.current = editor;
     editor.focus();
   };
