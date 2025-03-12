@@ -13,13 +13,12 @@ import {
 } from '@mui/material';
 
 import AddIcon from '@mui/icons-material/Add';
-import PropTypes from 'prop-types';
+import DeleteConfirmationDialog from '../shared/delete-confirmation-dialog';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import HistoryIcon from '@mui/icons-material/History';
 import SchemaRoundedIcon from '@mui/icons-material/SchemaRounded';
-import { SqlConnection } from '../../../shared/types/sql-connection';
-import DeleteConfirmationDialog from './shared/delete-confirmation-dialog'
+import { SqlConnection } from '../../../../shared/types/sql-connection';
 import { useState } from 'react';
 
 const getDefaultConnection = (): SqlConnection =>
@@ -49,11 +48,10 @@ const SqlConnectionTable: React.FC<SqlConnectionTableProps> = ({
 }) => {
   const [connectionToDelete, setConnectionToDelete] = useState<SqlConnection | null>();
 
-
   const handleDeleteConnection = () => {
     if (connectionToDelete) onDelete(connectionToDelete);
     setConnectionToDelete(null);
-  }
+  };
 
   return (
     <div>
@@ -122,23 +120,14 @@ const SqlConnectionTable: React.FC<SqlConnectionTableProps> = ({
           </TableFooter>
         </Table>
       </TableContainer>
-      <DeleteConfirmationDialog open={Boolean(connectionToDelete)} onClose={() => setConnectionToDelete(null)} onConfirm={handleDeleteConnection} itemName={connectionToDelete?.connectionName} />
+      <DeleteConfirmationDialog
+        open={Boolean(connectionToDelete)}
+        onClose={() => setConnectionToDelete(null)}
+        onConfirm={handleDeleteConnection}
+        itemName={connectionToDelete?.connectionName}
+      />
     </div>
   );
-};
-SqlConnectionTable.propTypes = {
-  data: PropTypes.arrayOf(
-    PropTypes.shape({
-      connectionId: PropTypes.string.isRequired,
-      connectionName: PropTypes.string.isRequired,
-      connectionString: PropTypes.string.isRequired,
-      queryHistory: PropTypes.array.isRequired,
-    }),
-  ).isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-  onAdd: PropTypes.func.isRequired,
-  onHistory: PropTypes.func.isRequired,
 };
 
 export default SqlConnectionTable;

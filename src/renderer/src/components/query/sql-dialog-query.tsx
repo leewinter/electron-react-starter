@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import SqlQueryComponent from './sql-query-component';
-import { SqlConnection } from '../../../shared/types/sql-connection'; // Adjust the import path as necessary
+import { SqlConnection } from '../../../../shared/types/sql-connection'; // Adjust the import path as necessary
 
 interface SqlDialogQueryProps {
   open: boolean; // Controls dialog visibility
@@ -11,6 +11,8 @@ interface SqlDialogQueryProps {
 }
 
 const SqlDialogQuery: React.FC<SqlDialogQueryProps> = ({ open, onClose, query, connection }) => {
+  // if (!connection?.connectionId) return null;
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xl" fullWidth>
       <DialogTitle>SQL Query</DialogTitle>
