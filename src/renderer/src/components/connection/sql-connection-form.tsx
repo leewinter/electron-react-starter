@@ -8,7 +8,7 @@ import {
   DialogContent,
   DialogActions,
 } from '@mui/material';
-import { type SqlConnection } from '../../../shared/types/sql-connection';
+import { type SqlConnection } from '../../../../shared/types/sql-connection';
 
 type SqlConnectionDialogProps = {
   open: boolean;
