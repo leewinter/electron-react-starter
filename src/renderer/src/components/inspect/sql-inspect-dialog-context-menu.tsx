@@ -5,7 +5,7 @@ import { SqlConnection } from 'src/shared/types/sql-connection';
 import SqlDialogQuery from '../query/sql-dialog-query';
 import { useAiServices } from '../../hooks/use-ai-services';
 import ModalLoader from '../shared/modal-loader';
-import { useDeepSeekApiKey } from '../../hooks/use-deep-seek-api-key';
+import { useSettings } from '../../hooks/use-settings';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import SqlQueryHistoryDialog from '../query/sql-query-history-dialog';
 import HistoryIcon from '@mui/icons-material/History';
@@ -50,7 +50,7 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
   const [sqlPrompt, setSqlPrompt] = useState<string | null>(null);
 
   const { getSqlJoins } = useAiServices();
-  const { apiKey } = useDeepSeekApiKey();
+  const { settings } = useSettings();
   const { sendMessage, onMessage, removeListener } = useEventChannel({
     channel: DataChannel.SQL_LINT,
   });
@@ -93,7 +93,7 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
   };
 
   const handleGetRelationships = async () => {
-    if (!apiKey) {
+    if (!settings.ai.deepSeekApiKey) {
       setQuery('No AI API Key set in settings');
       handleClose();
       return;
@@ -109,10 +109,12 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
 Select TOP 10 ${columnList} FROM ${schema?.name}.${table?.name}
 
 -- joining to these:-
--- ${foreignKeys?.map((fk) => {
-      const foreignColumnList = getColumnList(fk.foreignTable);
-      return `${fk.referencedTable} ON ${fk.fullName} with columns (${foreignColumnList})`;
-    }).join(', ')}
+-- ${foreignKeys
+      ?.map((fk) => {
+        const foreignColumnList = getColumnList(fk.foreignTable);
+        return `${fk.referencedTable} ON ${fk.fullName} with columns (${foreignColumnList})`;
+      })
+      .join(', ')}
 
 -- where possible can a left join be used to the main table so I get rows regardless of the relationships existing
     `);
@@ -123,7 +125,7 @@ Select TOP 10 ${columnList} FROM ${schema?.name}.${table?.name}
 
   const handleFetchSqlPrompt = async () => {
     setLoading(true);
-    const aiResult = await getSqlJoins(sqlPrompt, apiKey);
+    const aiResult = await getSqlJoins(sqlPrompt, settings.ai.deepSeekApiKey);
     setQuery(aiResult || null);
     setLoading(false);
   };
