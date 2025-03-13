@@ -1,12 +1,13 @@
-import { IconButton } from '@mui/material';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import { useEventChannel } from '../hooks/use-event-channel';
 import {
   DataChannel,
   EventRequest,
   EventResponse,
   SqlConnectionInspectPayload,
-} from '../../../shared/types/data-channel.d';
+} from '../../../../shared/types/data-channel.d';
+
+import { IconButton } from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { useEventChannel } from '../../hooks/use-event-channel';
 
 const SqlConnectionInspect: React.FC<SqlConnectionInspectPayload> = ({ connection, onLoaded }) => {
   const { sendMessage, onMessage, removeListener } = useEventChannel({
