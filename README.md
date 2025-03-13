@@ -88,7 +88,7 @@ Add the following to the file.
 
 ```shell
 set CSC_KEY_PASSWORD=mssql-inspect
-set CSC_LINK=cert/VennersysElectronSelfSignedCert.pfx
+set CSC_LINK=cert/MSSQLInspectElectronSelfSignedCert.pfx
 npx electron-builder --win
 ```
 
