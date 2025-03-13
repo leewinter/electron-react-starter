@@ -6,6 +6,8 @@ import SqlDialogQuery from './sql-dialog-query';
 import { useAiServices } from '../hooks/use-ai-services';
 import ModalLoader from '../components/shared/modal-loader';
 import { useDeepSeekApiKey } from '../hooks/use-deep-seek-api-key';
+import { Badge } from '@mui/material';
+import PsychologyIcon from '@mui/icons-material/Psychology';
 
 type MousePosition = {
   mouseX: number;
@@ -108,7 +110,10 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
         ) : null}
         {hasForeignKeys.length ? (
           <MenuItem onClick={handleGetRelationships}>
-            (AI) Select TOP 10 * FROM [RelatedTables]
+            Select TOP 10 * FROM [RelatedTables]
+            <Badge badgeContent="AI" color="primary">
+              <PsychologyIcon fontSize="large" />
+            </Badge>
           </MenuItem>
         ) : null}
       </Menu>
