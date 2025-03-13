@@ -36,7 +36,7 @@ export default function SqlQueryComponent({ initialState, onStateChange }): JSX.
     initialState.isResultsExpanded ?? false,
   );
 
-  const { connections, setConnections } = useSqlConnections();
+  const { connections } = useSqlConnections();
   const { sendMessage, onMessage, removeListener } = useEventChannel({
     channel: DataChannel.SQL_EXECUTE,
   });
