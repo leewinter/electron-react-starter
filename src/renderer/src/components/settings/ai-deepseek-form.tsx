@@ -6,7 +6,10 @@ import {
   DialogActions,
   TextField,
   Button,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useDeepSeekApiKey } from '../../hooks/use-deep-seek-api-key';
 
 interface DeepSeekDialogProps {
@@ -16,6 +19,7 @@ interface DeepSeekDialogProps {
 
 const DeepSeekDialog: React.FC<DeepSeekDialogProps> = ({ open, onClose }) => {
   const [key, setKey] = useState<string>('');
+  const [showKey, setShowKey] = useState<boolean>(false);
 
   const { apiKey, setApiKey } = useDeepSeekApiKey();
 
@@ -39,7 +43,18 @@ const DeepSeekDialog: React.FC<DeepSeekDialogProps> = ({ open, onClose }) => {
           value={key}
           onChange={(e) => setKey(e.target.value)}
           margin="dense"
-          type="password"
+          type={showKey ? 'text' : 'password'}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setShowKey((prev) => !prev)}>
+                    {showKey ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
         />
       </DialogContent>
       <DialogActions>
