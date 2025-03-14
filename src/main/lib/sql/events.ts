@@ -44,6 +44,26 @@ const formatSqlInspect = ({ dbTables, dbForeingKeys, dbColumns }) => {
   return result;
 };
 
+const formatSqlResponse = (response) => {
+  const columnSets: Array<SqlColumn[]> = Array.isArray(response?.columns)
+    ? response.columns.map((columnSet) => {
+        return columnSet.map((col: MssqlTediousColumn) => {
+          return {
+            name: col.name,
+            type: col.type.name,
+            length: col.length,
+            nullable: col.nullable,
+            precision: col.precision,
+            scale: col.scale,
+          } as SqlColumn;
+        });
+      })
+    : [];
+
+  const recordsets = Array.isArray(response?.recordsets) ? response.recordsets : [];
+  return { recordsets, columnSets };
+};
+
 export const SqlEventsDictionary = {
   [DataChannel.SQL_LINT]: function (): void {
     ipcMain.on(
@@ -80,30 +100,15 @@ export const SqlEventsDictionary = {
           await mssql.connect(sqlConfig);
           const request = new mssql.Request();
           request.arrayRowMode = true;
+          request.multiple = true;
 
           const result = await request.query(args.payload.sql);
 
-          const sqlResult = result as unknown as SqlExecutionResponsePayload;
-
-          const recordset = result.recordset ?? [];
-
-          const columns: SqlColumn[] =
-            Array.isArray(sqlResult?.columns) && Array.isArray(sqlResult.columns[0])
-              ? sqlResult.columns[0].map((col: MssqlTediousColumn) => {
-                  return {
-                    name: col.name,
-                    type: col.type.name,
-                    length: col.length,
-                    nullable: col.nullable,
-                    precision: col.precision,
-                    scale: col.scale,
-                  } as SqlColumn;
-                })
-              : [];
+          const { recordsets, columnSets } = formatSqlResponse(result);
 
           const generatedResponsePayload = {
             channel: DataChannel.SQL_EXECUTE,
-            payload: { recordset, columns, error: null },
+            payload: { error: null, recordsets, columnSets },
           } as EventResponse<SqlExecutionResponsePayload>;
 
           event.reply(`${DataChannel.SQL_EXECUTE}-response`, generatedResponsePayload);
@@ -111,7 +116,7 @@ export const SqlEventsDictionary = {
           console.error(error);
           const generatedResponsePayload = {
             channel: DataChannel.SQL_EXECUTE,
-            payload: { recordset: [], columns: [], error: error.message },
+            payload: { recordsets: [], columnSets: [], error: error.message },
           } as EventResponse<SqlExecutionResponsePayload>;
           event.reply(`${DataChannel.SQL_EXECUTE}-response`, generatedResponsePayload);
         }

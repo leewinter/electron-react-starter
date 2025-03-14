@@ -122,7 +122,11 @@ export default function SqlQueryComponent({ initialState, onStateChange }): JSX.
           <Typography variant="h6">Query Results</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <ReportGrid sqlResults={sqlResults} />
+          {sqlResults && sqlResults.columnSets.map((colSet, index) => {
+            const results = { columns: colSet, recordset: sqlResults.recordsets[index], error: sqlResults.error };
+
+            return <ReportGrid key={index} sqlResults={results} />
+          })}
         </AccordionDetails>
       </Accordion>
     </Container>
