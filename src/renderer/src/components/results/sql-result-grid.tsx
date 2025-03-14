@@ -9,10 +9,17 @@ import {
 } from '@mui/x-data-grid';
 import camelCase from 'lodash.camelcase';
 import { useTheme } from '@mui/material/styles';
-import { SqlExecutionResponsePayload } from '../../../shared/types/data-channel.d';
+import { SqlColumn } from '../../../../shared/types/data-channel';
+import Alert from '@mui/material/Alert';
+
+type SqlResult = {
+  columns: SqlColumn[],
+  recordset: Array<unknown[]>,
+  error: string | null
+}
 
 interface ReportGridProps {
-  sqlResults: SqlExecutionResponsePayload | undefined;
+  sqlResults: SqlResult | undefined;
 }
 
 const baseColumn = {
@@ -79,7 +86,7 @@ type DynamicObject = {
 };
 
 const constructJson = (columns: Array<ColumType>, recordset: Array<any>): Array<DynamicObject> => {
-  const result = recordset.map(row => {
+  const result = recordset.map((row) => {
     const obj: DynamicObject = {};
     columns.forEach((column: ColumType, indexKey: number) => {
       if (['DateTime', 'Date'].includes(column.type) && row[indexKey]) {
@@ -97,7 +104,7 @@ const constructJson = (columns: Array<ColumType>, recordset: Array<any>): Array<
 const getColumnDefinitions = (
   columns: { name: string; camelName: string; type: string; jsType: () => string }[],
 ): any[] => {
-  return columns.map(col => {
+  return columns.map((col) => {
     let definition: any = {
       ...baseColumn,
       headerName: col.name,
@@ -187,6 +194,8 @@ const ReportGrid: React.FC<ReportGridProps> = ({ sqlResults }) => {
     };
   }, [sqlResults]);
 
+  if (!sqlResults) return null;
+
   return (
     <>
       {loading && 'loading...'}
@@ -196,17 +205,17 @@ const ReportGrid: React.FC<ReportGridProps> = ({ sqlResults }) => {
             className={`header-panel ${columnDefinitions.length === 0 ? 'bg-primary-warning' : 'bg-primary-default'}`}
           >
             <p className="text-2xl text-white">
-              {columnDefinitions.length === 0 ? '' : 'No Data Found'}
+              {sqlResults.error || columnDefinitions.length === 0 ? '' : 'No Data Found'}
             </p>
+            {sqlResults.error ? <Alert severity="error">{sqlResults.error}</Alert> : null}
           </div>
         </div>
       )}
       {!loading && rows.length > 0 && columnDefinitions.length > 0 && (
         <div className="flex justify-center">
-          <div style={{ height: 'calc(100vh - 200px)' }} className="w-full">
+          <div className="w-full">
             <Box
               sx={{
-                height: 'calc(100vh - 200px)',
                 width: '100%',
                 backgroundColor,
                 color: textColor,
