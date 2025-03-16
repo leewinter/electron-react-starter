@@ -76,37 +76,39 @@ const QueryHistoryTable: React.FC<QueryHistoryProps> = ({ connection }) => {
                     <TableCell align="right">
                       <strong>Row Count</strong>
                     </TableCell>
-                    <TableCell>
+                    <TableCell align="right">
                       <strong>Date</strong>
                     </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {displayedQueries.map((query) => (
-                    <TableRow
-                      key={query.queryHistoryItemId}
-                      onClick={() => setQuery(query.sql)}
-                      sx={{ cursor: 'pointer', '&:hover': { backgroundColor: 'action.hover' } }}
-                    >
-                      {!isSmallScreen && <TableCell>{query.queryHistoryItemId}</TableCell>}
-                      <TableCell>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            maxWidth: '300px', // Prevents overly long queries from breaking UI
-                          }}
-                          title={query.sql} // Show full SQL on hover
-                        >
-                          {query.sql}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">{query.rowCountResult}</TableCell>
-                      <TableCell align="right">{query.date?.toLocaleString()}</TableCell>
-                    </TableRow>
-                  ))}
+                  {displayedQueries
+                    .sort((a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0))
+                    .map((query) => (
+                      <TableRow
+                        key={query.queryHistoryItemId}
+                        onClick={() => setQuery(query.sql)}
+                        sx={{ cursor: 'pointer', '&:hover': { backgroundColor: 'action.hover' } }}
+                      >
+                        {!isSmallScreen && <TableCell>{query.queryHistoryItemId}</TableCell>}
+                        <TableCell>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              maxWidth: '300px', // Prevents overly long queries from breaking UI
+                            }}
+                            title={query.sql} // Show full SQL on hover
+                          >
+                            {query.sql}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="right">{query.rowCountResult}</TableCell>
+                        <TableCell align="right">{query.date?.toLocaleString()}</TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </TableContainer>
