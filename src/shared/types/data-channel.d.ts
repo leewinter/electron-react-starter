@@ -1,4 +1,5 @@
 import { SqlConnection } from './sql-connection';
+
 ///
 // Event Payloads
 export enum DataChannel {
@@ -29,6 +30,7 @@ export type EventResponse<T> = {
 // Lint
 export type SqlLintPayload = {
   sql: string;
+  settings: any;
 };
 
 // Execute
@@ -42,8 +44,8 @@ export type SqlColumn = {
 };
 
 export type SqlExecutionResponsePayload = {
-  recordset: Array<Array<unknown>>;
-  columns: SqlColumn[];
+  recordsets: Array<Array<unknown[]>>;
+  columnSets: Array<SqlColumn[]>;
   error: string | null;
 };
 
