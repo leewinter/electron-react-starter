@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -17,24 +17,33 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import { SqlConnection } from '../../../shared/types/sql-connection';
+import { SqlConnection, QueryHistory } from '../../../shared/types/sql-connection';
 import SqlDialogQuery from './sql-dialog-query';
 
 interface QueryHistoryProps {
   connection: SqlConnection;
+  queryHistoryFilter?: (query: QueryHistory) => boolean;
 }
 
-const QueryHistoryTable: React.FC<QueryHistoryProps> = ({ connection }) => {
-  const { connectionName, queryHistory = [] } = connection;
+const QueryHistoryTable: React.FC<QueryHistoryProps> = ({ connection, queryHistoryFilter }) => {
+  const { connectionName } = connection;
   const [query, setQuery] = useState<string | null>(null);
   const [queryLimit, setQueryLimit] = useState<number>(5);
 
   const theme = useTheme();
 
+  const filteredQueryHistory = useMemo(() => {
+    if (!connection || !connection.queryHistory) return [];
+    return queryHistoryFilter
+      ? connection.queryHistory.filter(queryHistoryFilter)
+      : connection.queryHistory;
+  }, [connection, queryHistoryFilter]);
+
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
 
   // Determine the queries to show based on the selected limit
-  const displayedQueries = queryLimit === -1 ? queryHistory : queryHistory.slice(-queryLimit);
+  const displayedQueries =
+    queryLimit === -1 ? filteredQueryHistory : filteredQueryHistory.slice(-queryLimit);
 
   return (
     <Card sx={{ marginBottom: 2 }}>
@@ -43,7 +52,7 @@ const QueryHistoryTable: React.FC<QueryHistoryProps> = ({ connection }) => {
           Query History for {connectionName}
         </Typography>
 
-        {queryHistory.length > 0 ? (
+        {filteredQueryHistory.length > 0 ? (
           <>
             {/* Dropdown to control how many history items are shown */}
             <FormControl sx={{ minWidth: 120, marginBottom: 2 }}>
@@ -119,6 +128,7 @@ const QueryHistoryTable: React.FC<QueryHistoryProps> = ({ connection }) => {
           </Typography>
         )}
       </CardContent>
+
       <SqlDialogQuery
         query={query}
         connection={connection}
