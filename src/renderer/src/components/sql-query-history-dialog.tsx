@@ -14,6 +14,7 @@ interface QueryHistoryDialogProps {
   onClose: () => void;
   connection: SqlConnection;
   queryHistoryFilter?: (query: QueryHistory) => boolean;
+  filterTitle?: string;
 }
 
 const SqlQueryHistoryDialog: React.FC<QueryHistoryDialogProps> = ({
@@ -21,6 +22,7 @@ const SqlQueryHistoryDialog: React.FC<QueryHistoryDialogProps> = ({
   onClose,
   connection,
   queryHistoryFilter,
+  filterTitle,
 }) => {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xl" fullWidth>
@@ -29,7 +31,11 @@ const SqlQueryHistoryDialog: React.FC<QueryHistoryDialogProps> = ({
         {connection ? (
           <>
             <Typography variant="subtitle1">
-              Viewing history for: <strong>{connection.connectionName}</strong>
+              Viewing history for:{' '}
+              <strong>
+                {connection.connectionName}
+                {filterTitle && ` - ${filterTitle}`}
+              </strong>
             </Typography>
             <QueryHistoryTable connection={connection} queryHistoryFilter={queryHistoryFilter} />
           </>
