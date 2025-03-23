@@ -1,23 +1,24 @@
-import React, { useMemo, useState } from 'react';
-import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
-import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import {
   Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Typography,
 } from '@mui/material';
-import SchemaIcon from '@mui/icons-material/Schema';
-import TableChartIcon from '@mui/icons-material/TableChart';
+import React, { useMemo, useState } from 'react';
+
+import ContextMenuComponent from './sql-inspect-dialog-context-menu';
 import DnsIcon from '@mui/icons-material/Dns'; // Column Icon
 import LinkIcon from '@mui/icons-material/Link'; // Foreign Key Icon
-import StorageIcon from '@mui/icons-material/Storage'; // Database Icon
+import SchemaIcon from '@mui/icons-material/Schema';
+import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { SqlConnection } from 'src/shared/types/sql-connection';
-import SqlConnectionInspect from './sql-connection-inspect';
-import ContextMenuComponent from './sql-inspect-dialog-context-menu';
+import SqlConnectionInspect from './connection/sql-connection-inspect';
+import StorageIcon from '@mui/icons-material/Storage'; // Database Icon
+import TableChartIcon from '@mui/icons-material/TableChart';
+import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { useTheme } from '@mui/material/styles';
 
 // Represents a single Foreign Key reference
