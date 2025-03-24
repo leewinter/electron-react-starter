@@ -15,7 +15,7 @@ import LinkIcon from '@mui/icons-material/Link'; // Foreign Key Icon
 import SchemaIcon from '@mui/icons-material/Schema';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { SqlConnection } from 'src/shared/types/sql-connection';
-import SqlConnectionInspect from './connection/sql-connection-inspect';
+import SqlConnectionInspect from '../connection/sql-connection-inspect';
 import StorageIcon from '@mui/icons-material/Storage'; // Database Icon
 import TableChartIcon from '@mui/icons-material/TableChart';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';

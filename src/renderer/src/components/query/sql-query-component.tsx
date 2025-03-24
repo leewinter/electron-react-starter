@@ -12,18 +12,18 @@ import {
   EventResponse,
   SqlExecutionRequestPayload,
   SqlExecutionResponsePayload,
-} from '../../../shared/types/data-channel.d';
+} from '../../../../shared/types/data-channel.d';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import PropTypes from 'prop-types';
-import ReportGrid from '../components/sql-result-grid';
-import SqlCodeEditor from './editor/sql-code-editor';
-import { SqlConnection } from '../../../shared/types/sql-connection';
-import SqlConnectionIcon from './connection/sql-connection-icon';
-import SqlConnectionSelect from './connection/sql-connection-select';
+import ReportGrid from '../results/sql-result-grid';
+import SqlCodeEditor from '../editor/sql-code-editor';
+import { SqlConnection } from '../../../../shared/types/sql-connection';
+import SqlConnectionIcon from '../connection/sql-connection-icon';
+import SqlConnectionSelect from '../connection/sql-connection-select';
 import { Stack } from '@mui/material';
-import { useEventChannel } from '../hooks/use-event-channel';
-import { useSqlConnections } from '../hooks/use-sql-connections';
+import { useEventChannel } from '../../hooks/use-event-channel';
+import { useSqlConnections } from '../../hooks/use-sql-connections';
 import { useState } from 'react';
 
 export default function SqlQueryComponent({ query, connection }): JSX.Element {

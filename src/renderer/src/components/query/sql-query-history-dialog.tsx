@@ -6,8 +6,8 @@ import {
   Button,
   Typography,
 } from '@mui/material';
-import QueryHistoryTable from '../components/sql-query-history-table';
-import { SqlConnection, QueryHistory } from '../../../shared/types/sql-connection';
+import QueryHistoryTable from './sql-query-history-table';
+import { SqlConnection, QueryHistory } from '../../../../shared/types/sql-connection';
 
 interface QueryHistoryDialogProps {
   open: boolean;
