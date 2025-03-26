@@ -11,6 +11,14 @@ export interface DeepSeekResponse {
   usage: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
 }
 
+export const getSqlBasePrompt = (queryDescription) => `
+Generate only a valid SQL query without explanation, using ANSI SQL syntax.
+Ensure it joins the necessary tables and includes proper WHERE conditions.
+Return only the SQL code snippet.
+
+Description: ${queryDescription}
+`;
+
 export class DeepSeekApi {
   private apiKey: string;
   private baseUrl: string = 'https://api.deepseek.com/v1/chat/completions';
@@ -20,14 +28,6 @@ export class DeepSeekApi {
   }
 
   async generateSQL(queryDescription: string, model: string = 'deepseek-chat') {
-    const prompt = `
-      Generate only a valid SQL query without explanation, using ANSI SQL syntax.
-      Ensure it joins the necessary tables and includes proper WHERE conditions.
-      Return only the SQL code snippet.
-      
-      Description: ${queryDescription}
-    `;
-
     const response = await fetch(this.baseUrl, {
       method: 'POST',
       headers: {
@@ -36,7 +36,7 @@ export class DeepSeekApi {
       },
       body: JSON.stringify({
         model,
-        messages: [{ role: 'user', content: prompt }],
+        messages: [{ role: 'user', content: queryDescription }],
       }),
     });
 
