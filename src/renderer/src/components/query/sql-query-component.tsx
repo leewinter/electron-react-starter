@@ -24,7 +24,8 @@ import SqlConnectionSelect from '../connection/sql-connection-select';
 import { Stack } from '@mui/material';
 import { useEventChannel } from '../../hooks/use-event-channel';
 import { useSqlConnections } from '../../hooks/use-sql-connections';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useMonaco } from '@monaco-editor/react';
 
 export default function SqlQueryComponent({ query, connection }): JSX.Element {
   const [selectedConnection, setSelectedConnection] = useState<SqlConnection | null>(
@@ -34,11 +35,27 @@ export default function SqlQueryComponent({ query, connection }): JSX.Element {
   const [sqlResults, setSqlResults] = useState<SqlExecutionResponsePayload>();
   const [isEditorExpanded, setIsEditorExpanded] = useState(true);
   const [isResultsExpanded, setIsResultsExpanded] = useState(false);
+  const monaco = useMonaco();
 
   const { connections, setConnections } = useSqlConnections();
   const { sendMessage, onMessage, removeListener } = useEventChannel({
     channel: DataChannel.SQL_EXECUTE,
   });
+
+  const additionalSuggestions = useMemo(() => {
+    if (selectedConnection && selectedConnection.tables) {
+      const suggestions = selectedConnection.tables.map((t) => {
+        return {
+          label: `${t.TableName} (${t.SchemaName})`,
+          kind: monaco?.languages.CompletionItemKind.Class,
+          insertText: `${t.SchemaName}.${t.TableName}`,
+          documentation: `Table containing ${t.TableName}`,
+          range: null,
+        };
+      });
+      return suggestions;
+    } else return [];
+  }, [selectedConnection]);
 
   const handleUpdateConnectionHistory = (
     selectedConnection: SqlConnection,
@@ -108,7 +125,11 @@ export default function SqlQueryComponent({ query, connection }): JSX.Element {
           <Typography variant="h6">SQL Query Editor</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <SqlCodeEditor code={code} onChange={setCode} />
+          <SqlCodeEditor
+            code={code}
+            onChange={setCode}
+            additionalSuggestions={additionalSuggestions}
+          />
           <Button
             variant="contained"
             sx={{ mt: 2 }}
