@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import SqlEditor from '../editor/sql-code-editor';
 
 type SqlPromptDialogProps = {
   open: boolean;
   sqlPrompt: string | null;
   onClose: () => void;
   onSubmit: (data: string) => void;
+  additionalSuggestions?: any;
 };
 
 const SqlPromptDialog: React.FC<SqlPromptDialogProps> = ({
@@ -20,6 +15,7 @@ const SqlPromptDialog: React.FC<SqlPromptDialogProps> = ({
   sqlPrompt,
   onClose,
   onSubmit,
+  additionalSuggestions,
 }) => {
   const [prompt, setPrompt] = useState(sqlPrompt || '');
 
@@ -35,16 +31,10 @@ const SqlPromptDialog: React.FC<SqlPromptDialogProps> = ({
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>Modify SQL Prompt</DialogTitle>
       <DialogContent>
-        <TextField
-          fullWidth
-          multiline
-          minRows={5}
-          variant="outlined"
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Edit your SQL query here..."
-          autoFocus
-          sx={{ mt: 1 }}
+        <SqlEditor
+          code={prompt}
+          onChange={setPrompt}
+          additionalSuggestions={additionalSuggestions}
         />
       </DialogContent>
       <DialogActions>

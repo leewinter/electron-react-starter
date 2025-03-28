@@ -100,7 +100,7 @@ function mapSqlSchemaToTreeData(tables: any[]): SqlSchemaTree {
         .map((fk) => ({
           id: `fk-${SchemaName}-${TableName}-${fk.ForeignKeyName}`,
           name: `${fk.ReferencedTableName}.${fk.ReferencedColumnName}`,
-          fullName: `${fk.ColumnName} → ${fk.ReferencedTableName}.${fk.ReferencedColumnName}`,
+          fullName: `${fk.ColumnName} → ${fk.SchemaName}.${fk.ReferencedTableName}.${fk.ReferencedColumnName}`,
           referencedTable: `${fk.ReferencedSchemaName}.${fk.ReferencedTableName}`,
           type: 'foreignKey',
         }));
