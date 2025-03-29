@@ -61,12 +61,12 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
     if (onClose) onClose();
   };
 
-  const getColumnList = () => {
-    return table?.children.map((col) => `[${col.name}]`).join(', ');
+  const getColumnList = (t) => {
+    return t?.children.map((col) => `[${col.name}]`).join(', ');
   };
 
   const handleSelectTop10 = () => {
-    const columnList = getColumnList();
+    const columnList = getColumnList(table);
     setQuery(`Select TOP 10 ${columnList} FROM ${schema?.name}.${table?.name}`);
     handleClose();
   };
@@ -82,13 +82,16 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
     const foreignKeys = columnsWithForeignKeys?.flatMap((n) =>
       n.children.filter((c) => c.type === 'foreignKey'),
     );
-    const columnList = getColumnList();
+    const columnList = getColumnList(table);
 
     const sqlPrompt = getSqlBasePrompt(`I need this table:-
 Select TOP 10 ${columnList} FROM ${schema?.name}.${table?.name}
 
 -- joining to these:-
--- ${foreignKeys?.map((fk) => `${fk.referencedTable} ON ${fk.fullName}`).join(', ')}
+-- ${foreignKeys?.map((fk) => {
+      const foreignColumnList = getColumnList(fk.foreignTable);
+      return `${fk.referencedTable} ON ${fk.fullName} with columns (${foreignColumnList})`;
+    }).join(', ')}
 
 -- where possible can a left join be used to the main table so I get rows regardless of the relationships existing
     `);

@@ -28,6 +28,7 @@ export interface ForeignKey {
   fullName: string;
   referencedTable: string;
   type: 'foreignKey';
+  foreignTable?: Table;
 }
 
 // Represents a single column, which may contain foreign keys as children
@@ -61,11 +62,14 @@ export type SqlSchemaTree = Schema[];
 
 function mapSqlSchemaToTreeData(tables: any[]): SqlSchemaTree {
   const schemaMap: Record<string, Schema> = {};
+  const tableMap: Record<string, Table> = {}; // Store references to tables
+  const pendingForeignKeys: { fk: ForeignKey; referencedTableKey: string }[] = [];
 
+  // **First Pass: Create all schemas and tables**
   tables.forEach((table) => {
-    const { SchemaName, TableName, columns, foreignKeys } = table;
+    const { SchemaName, TableName, columns } = table;
 
-    // If the schema doesn't exist, create it
+    // Ensure the schema exists
     if (!schemaMap[SchemaName]) {
       schemaMap[SchemaName] = {
         id: `schema-${SchemaName}`,
@@ -83,11 +87,23 @@ function mapSqlSchemaToTreeData(tables: any[]): SqlSchemaTree {
       children: [],
     };
 
-    // Add columns and nest foreign keys under their respective columns
+    // Store the table reference in the tableMap
+    const tableKey = `${SchemaName}.${TableName}`;
+    tableMap[tableKey] = tableNode;
+
+    // Add the table node to the schema
+    schemaMap[SchemaName].children.push(tableNode);
+  });
+
+  // **Second Pass: Add columns and foreign keys**
+  tables.forEach((table) => {
+    const { SchemaName, TableName, columns, foreignKeys } = table;
+    const tableNode = tableMap[`${SchemaName}.${TableName}`];
+
     tableNode.children = columns.map((col): Column => {
       const colNode: Column = {
         id: `col-${SchemaName}-${TableName}-${col.ColumnName}`,
-        name: `${col.ColumnName}`,
+        name: col.ColumnName,
         dataType: col.DataType,
         fullName: `${col.ColumnName} (${col.DataType})`,
         type: 'column',
@@ -95,26 +111,40 @@ function mapSqlSchemaToTreeData(tables: any[]): SqlSchemaTree {
       };
 
       // Find foreign keys related to this column
-      const relatedForeignKeys: ForeignKey[] = (foreignKeys || [])
-        .filter((fk) => fk.ColumnName === col.ColumnName)
-        .map((fk) => ({
+      const relatedForeignKeys: ForeignKey[] = (foreignKeys || []).filter(
+        (fk) => fk.ColumnName === col.ColumnName
+      ).map((fk) => {
+        const referencedTableKey = `${fk.ReferencedSchemaName}.${fk.ReferencedTableName}`;
+
+        const foreignKey: ForeignKey = {
           id: `fk-${SchemaName}-${TableName}-${fk.ForeignKeyName}`,
           name: `${fk.ReferencedTableName}.${fk.ReferencedColumnName}`,
-          fullName: `${fk.ColumnName} → ${fk.SchemaName}.${fk.ReferencedTableName}.${fk.ReferencedColumnName}`,
-          referencedTable: `${fk.ReferencedSchemaName}.${fk.ReferencedTableName}`,
+          fullName: `${fk.ColumnName} → ${fk.ReferencedSchemaName}.${fk.ReferencedTableName}.${fk.ReferencedColumnName}`,
+          referencedTable: referencedTableKey,
           type: 'foreignKey',
-        }));
+          foreignTable: tableMap[referencedTableKey] || null, // Try to find the referenced table
+        };
+
+        if (!foreignKey.foreignTable) {
+          pendingForeignKeys.push({ fk: foreignKey, referencedTableKey });
+        }
+
+        return foreignKey;
+      });
 
       colNode.children = relatedForeignKeys;
       return colNode;
     });
+  });
 
-    // Add the table node to the schema
-    schemaMap[SchemaName].children.push(tableNode);
+  // **Final Pass: Resolve pending foreign keys**
+  pendingForeignKeys.forEach(({ fk, referencedTableKey }) => {
+    fk.foreignTable = tableMap[referencedTableKey] || null;
   });
 
   return Object.values(schemaMap);
 }
+
 
 type SqlInspectInputProps = {
   connection: SqlConnection | null;
