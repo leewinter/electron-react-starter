@@ -12,6 +12,13 @@ import HistoryIcon from '@mui/icons-material/History';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import { getSqlBasePrompt } from '../../services/deep-seek';
 import SqlPromptDialog from '../ai/sql-prompt-dialog';
+import { useEventChannel } from '../../hooks/use-event-channel';
+import {
+  type EventRequest,
+  type EventResponse,
+  DataChannel,
+  SqlLintPayload,
+} from '../../../../shared/types/data-channel.d';
 
 type MousePosition = {
   mouseX: number;
@@ -44,6 +51,9 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
 
   const { getSqlJoins } = useAiServices();
   const { apiKey } = useDeepSeekApiKey();
+  const { sendMessage, onMessage, removeListener } = useEventChannel({
+    channel: DataChannel.SQL_LINT,
+  });
 
   const breadcrumb = useMemo(() => {
     return [schema, table, column, fk]
@@ -65,9 +75,20 @@ const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
     return t?.children.map((col) => `[${col.name}]`).join(', ');
   };
 
+  const handleLint = async (sql: string, onCallback): Promise<void> => {
+    sendMessage({
+      channel: DataChannel.SQL_LINT,
+      payload: { sql },
+    } as EventRequest<SqlLintPayload>);
+    onMessage((response: EventResponse<SqlLintPayload>) => {
+      onCallback(response.payload.sql);
+      removeListener();
+    });
+  };
+
   const handleSelectTop10 = () => {
     const columnList = getColumnList(table);
-    setQuery(`Select TOP 10 ${columnList} FROM ${schema?.name}.${table?.name}`);
+    handleLint(`Select TOP 10 ${columnList} FROM ${schema?.name}.${table?.name}`, setQuery);
     handleClose();
   };
 
@@ -96,7 +117,7 @@ Select TOP 10 ${columnList} FROM ${schema?.name}.${table?.name}
 -- where possible can a left join be used to the main table so I get rows regardless of the relationships existing
     `);
 
-    setSqlPrompt(sqlPrompt);
+    handleLint(sqlPrompt, setSqlPrompt);
     handleClose();
   };
 
