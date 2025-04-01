@@ -1,7 +1,7 @@
 import { IconButton } from '@mui/material';
+import SettingsDialog from './settings-dialog';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useState } from 'react';
-import DeepSeekDialog from './ai-deepseek-form';
 
 const SettingsLaunchIcon: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
@@ -11,7 +11,7 @@ const SettingsLaunchIcon: React.FC = () => {
       <IconButton onClick={() => setShowSettings(true)} color="inherit">
         <SettingsIcon />
       </IconButton>
-      <DeepSeekDialog open={showSettings} onClose={() => setShowSettings(false)} />
+      <SettingsDialog open={showSettings} onClose={() => setShowSettings(false)} />
     </>
   );
 };

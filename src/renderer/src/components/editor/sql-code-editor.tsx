@@ -12,6 +12,7 @@ import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
 import MonacoEditor from '@monaco-editor/react';
 import { useSqlIntellisense } from './hooks/use-sql-intellisense';
 import { useTheme } from '@mui/material/styles';
+import { useSettings } from '@renderer/hooks/use-settings';
 
 const SqlEditor: React.FC<{
   code: string | undefined;
@@ -22,6 +23,7 @@ const SqlEditor: React.FC<{
   const [codeDirty, setCodeDirty] = useState(true);
   const editorRef = useRef();
   const theme = useTheme();
+  const { settings } = useSettings();
 
   useSqlIntellisense({ additionalSuggestions, editorRef });
 
@@ -38,7 +40,7 @@ const SqlEditor: React.FC<{
   const handleLint = async (sql: string | undefined): Promise<void> => {
     sendMessage({
       channel: DataChannel.SQL_LINT,
-      payload: { sql },
+      payload: { sql, settings: settings.sqlFormatter },
     } as EventRequest<SqlLintPayload>);
     onMessage((response: EventResponse<SqlLintPayload>) => {
       setCurrentCode(response.payload.sql);

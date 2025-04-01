@@ -1,4 +1,4 @@
-import { type EventRequest, type EventResponse } from '../../../preload/index.d';
+import { type EventRequest, type EventResponse } from '../../../shared/types/data-channel.d';
 
 type EventChannelHookResponse = {
   sendMessage: (msg: EventRequest<any>) => void;

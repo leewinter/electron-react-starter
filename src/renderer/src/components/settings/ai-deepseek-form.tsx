@@ -1,72 +1,51 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  IconButton,
-  InputAdornment,
-} from '@mui/material';
+import { Box, IconButton, InputAdornment, TextField } from '@mui/material';
+import React, { useState } from 'react';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { useDeepSeekApiKey } from '../../hooks/use-deep-seek-api-key';
 
-interface DeepSeekDialogProps {
-  open: boolean;
-  onClose: () => void;
+import { SystemSettings } from '../../hooks/use-settings';
+
+interface AiSettingsFormProps {
+  settings: SystemSettings;
+  onUpdate: (settings: SystemSettings) => void;
 }
 
-const DeepSeekDialog: React.FC<DeepSeekDialogProps> = ({ open, onClose }) => {
-  const [key, setKey] = useState<string>('');
+const AiSettingsForm: React.FC<AiSettingsFormProps> = ({ settings, onUpdate }) => {
   const [showKey, setShowKey] = useState<boolean>(false);
 
-  const { apiKey, setApiKey } = useDeepSeekApiKey();
-
-  useEffect(() => {
-    if (key !== apiKey) setKey(apiKey || '');
-  }, [apiKey]);
-
-  const handleSave = () => {
-    setApiKey(key);
-    onClose();
+  const handleSelectChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    field: string,
+  ) => {
+    onUpdate({
+      ...settings,
+      ai: { ...settings.ai, [field]: event.target.value },
+    });
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Edit DeepSeek API Key</DialogTitle>
-      <DialogContent>
-        <TextField
-          label="DeepSeek API Key"
-          fullWidth
-          variant="outlined"
-          value={key}
-          onChange={(e) => setKey(e.target.value)}
-          margin="dense"
-          type={showKey ? 'text' : 'password'}
-          slotProps={{
-            input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setShowKey((prev) => !prev)}>
-                    {showKey ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="secondary">
-          Cancel
-        </Button>
-        <Button onClick={handleSave} color="primary" variant="contained">
-          Save
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 3 }}>
+      <TextField
+        label="DeepSeek API Key"
+        fullWidth
+        variant="outlined"
+        value={settings.ai.deepSeekApiKey}
+        onChange={(e) => handleSelectChange(e, 'deepSeekApiKey')}
+        margin="dense"
+        type={showKey ? 'text' : 'password'}
+        slotProps={{
+          input: {
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowKey((prev) => !prev)}>
+                  {showKey ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          },
+        }}
+      />
+    </Box>
   );
 };
 
-export default DeepSeekDialog;
+export default AiSettingsForm;
