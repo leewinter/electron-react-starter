@@ -4,6 +4,7 @@ import {
   AccordionSummary,
   Button,
   Container,
+  Stack,
   Typography,
 } from '@mui/material';
 import {
@@ -13,75 +14,58 @@ import {
   SqlExecutionRequestPayload,
   SqlExecutionResponsePayload,
 } from '../../../../shared/types/data-channel.d';
+import { useEffect, useMemo, useState } from 'react';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import PropTypes from 'prop-types';
 import ReportGrid from '../results/sql-result-grid';
-import SqlEditor from '../editor/sql-code-editor';
-import { SqlConnection } from '../../../../shared/types/sql-connection';
 import SqlConnectionIcon from '../connection/sql-connection-icon';
 import SqlConnectionSelect from '../connection/sql-connection-select';
-import { Stack } from '@mui/material';
+import SqlEditor from '../editor/sql-code-editor';
 import { useEventChannel } from '../../hooks/use-event-channel';
-import { useSqlConnections } from '../../hooks/use-sql-connections';
-import { useMemo, useState } from 'react';
 import { useMonaco } from '@monaco-editor/react';
+import { useSqlConnections } from '../../hooks/use-sql-connections';
 
-export default function SqlQueryComponent({ query, connection }): JSX.Element {
-  const [selectedConnection, setSelectedConnection] = useState<SqlConnection | null>(
-    connection ?? null,
+export default function SqlQueryComponent({ initialState, onStateChange }): JSX.Element {
+  const [selectedConnection, setSelectedConnection] = useState(initialState.connection || null);
+  const [code, setCode] = useState(initialState.query || 'SELECT * FROM cyn.Users');
+  const [sqlResults, setSqlResults] = useState<SqlExecutionResponsePayload | undefined>(
+    initialState.sqlResults,
   );
-  const [code, setCode] = useState<string>(query ?? 'select  * from  cyn.Roles');
-  const [sqlResults, setSqlResults] = useState<SqlExecutionResponsePayload>();
-  const [isEditorExpanded, setIsEditorExpanded] = useState(true);
-  const [isResultsExpanded, setIsResultsExpanded] = useState(false);
-  const monaco = useMonaco();
+  const [isEditorExpanded, setIsEditorExpanded] = useState(initialState.isEditorExpanded ?? true);
+  const [isResultsExpanded, setIsResultsExpanded] = useState(
+    initialState.isResultsExpanded ?? false,
+  );
 
   const { connections, setConnections } = useSqlConnections();
   const { sendMessage, onMessage, removeListener } = useEventChannel({
     channel: DataChannel.SQL_EXECUTE,
   });
 
+  const monaco = useMonaco();
   const additionalSuggestions = useMemo(() => {
-    if (selectedConnection && selectedConnection.tables) {
-      const suggestions = selectedConnection.tables.map((t) => {
-        return {
-          label: `${t.TableName} (${t.SchemaName})`,
-          kind: monaco?.languages.CompletionItemKind.Class,
-          insertText: `${t.SchemaName}.${t.TableName}`,
-          documentation: `Table containing ${t.TableName}`,
-          range: null,
-        };
-      });
-      return suggestions;
-    } else return [];
+    if (selectedConnection?.tables) {
+      return selectedConnection.tables.map((t) => ({
+        label: `${t.TableName} (${t.SchemaName})`,
+        kind: monaco?.languages.CompletionItemKind.Class,
+        insertText: `${t.SchemaName}.${t.TableName}`,
+        documentation: `Table containing ${t.TableName}`,
+      }));
+    }
+    return [];
   }, [selectedConnection]);
 
-  const handleUpdateConnectionHistory = (
-    selectedConnection: SqlConnection,
-    code: string,
-    payload: SqlExecutionResponsePayload,
-  ): void => {
-    const updated = connections.map((c: SqlConnection) =>
-      c.connectionId === selectedConnection.connectionId
-        ? {
-            ...selectedConnection,
-            queryHistory: [
-              ...(selectedConnection.queryHistory || []),
-              {
-                rowCountResult: payload.recordset.length,
-                queryHistoryItemId: crypto.randomUUID(),
-                sql: code,
-                date: new Date(),
-              },
-            ],
-          }
-        : c,
-    );
-    setConnections(updated);
-  };
+  // Sync component state to parent when any state changes
+  useEffect(() => {
+    onStateChange({
+      connection: selectedConnection,
+      query: code,
+      sqlResults,
+      isEditorExpanded,
+      isResultsExpanded,
+    });
+  }, [selectedConnection, code, sqlResults, isEditorExpanded, isResultsExpanded]);
 
-  const handleExecuteSqlClick = (): void => {
+  const handleExecuteSqlClick = () => {
     sendMessage({
       channel: DataChannel.SQL_EXECUTE,
       payload: { sql: code, selectedConnection },
@@ -91,35 +75,28 @@ export default function SqlQueryComponent({ query, connection }): JSX.Element {
       setSqlResults(response.payload);
       removeListener();
 
-      // Minimize editor and expand results
+      // Expand results, collapse editor
       setIsEditorExpanded(false);
       setIsResultsExpanded(true);
-      if (selectedConnection) {
-        handleUpdateConnectionHistory(selectedConnection, code, response.payload);
-      }
     });
   };
 
   return (
     <Container sx={{ mt: 3 }} maxWidth={false}>
-      {/* SQL Connection Select */}
       <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
         <SqlConnectionSelect
-          onChange={(connectionId: string): void => {
-            const selectedConnectionOption = connections.find(
-              (c: SqlConnection) => c.connectionId === connectionId,
-            );
-            setSelectedConnection(selectedConnectionOption || null);
+          onChange={(connectionId) => {
+            const selected = connections.find((c) => c.connectionId === connectionId);
+            setSelectedConnection(selected || null);
           }}
           selectedConnection={selectedConnection}
         />
         <SqlConnectionIcon />
       </Stack>
 
-      {/* SQL Code Editor in an Accordion */}
       <Accordion
         expanded={isEditorExpanded}
-        onChange={(): void => setIsEditorExpanded((prev: boolean) => !prev)}
+        onChange={() => setIsEditorExpanded(!isEditorExpanded)}
       >
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography variant="h6">SQL Query Editor</Typography>
@@ -137,10 +114,9 @@ export default function SqlQueryComponent({ query, connection }): JSX.Element {
         </AccordionDetails>
       </Accordion>
 
-      {/* SQL Result Grid in an Accordion */}
       <Accordion
         expanded={isResultsExpanded}
-        onChange={(): void => setIsResultsExpanded((prev: boolean) => !prev)}
+        onChange={() => setIsResultsExpanded(!isResultsExpanded)}
       >
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography variant="h6">Query Results</Typography>
@@ -152,18 +128,3 @@ export default function SqlQueryComponent({ query, connection }): JSX.Element {
     </Container>
   );
 }
-
-SqlQueryComponent.propTypes = {
-  query: PropTypes.string,
-  connection: PropTypes.shape({
-    connectionId: PropTypes.string.isRequired,
-    queryHistory: PropTypes.arrayOf(
-      PropTypes.shape({
-        rowCountResult: PropTypes.number.isRequired,
-        queryHistoryItemId: PropTypes.string,
-        sql: PropTypes.string.isRequired,
-        date: PropTypes.instanceOf(Date),
-      }),
-    ),
-  }),
-};
