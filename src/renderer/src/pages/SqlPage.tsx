@@ -22,13 +22,29 @@ export default function SqlPage(): JSX.Element {
   };
 
   const handleCloseTab = (tabId: number) => {
-    setTabs(tabs.filter((tab) => tab.id !== tabId));
+    setTabs((prevTabs) => {
+      const updatedTabs = prevTabs.filter((tab) => tab.id !== tabId);
+      if (updatedTabs.length === 0) {
+        // If no tabs are left, reset to default state
+        setActiveTab(0);
+        setTabStates({});
+        return [{ id: 0, label: 'Query 1' }];
+      }
+      // If closing the active tab, switch to the nearest tab
+      if (tabId === activeTab) {
+        const newActiveTab =
+          updatedTabs[Math.max(0, updatedTabs.findIndex((tab) => tab.id === tabId) - 1)]?.id ||
+          updatedTabs[0].id;
+        setActiveTab(newActiveTab);
+      }
+      return updatedTabs;
+    });
+
     setTabStates((prev) => {
       const newState = { ...prev };
       delete newState[tabId];
       return newState;
     });
-    if (tabs.length > 1) setActiveTab(tabs[tabs.length - 2].id);
   };
 
   const tabComponents = useMemo(() => {
@@ -50,7 +66,7 @@ export default function SqlPage(): JSX.Element {
   return (
     <Container sx={{ mt: 3 }} maxWidth={false}>
       <Tabs
-        value={activeTab}
+        value={tabs.some((t) => t.id === activeTab) ? activeTab : tabs[0]?.id ?? 0}
         onChange={(_, newValue) => setActiveTab(newValue)}
         variant="scrollable"
         scrollButtons="auto"
