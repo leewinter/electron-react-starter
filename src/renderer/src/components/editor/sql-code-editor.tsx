@@ -44,6 +44,7 @@ const SqlEditor: React.FC<{
     } as EventRequest<SqlLintPayload>);
     onMessage((response: EventResponse<SqlLintPayload>) => {
       setCurrentCode(response.payload.sql);
+      onChange(response.payload.sql ?? '');
       setCodeDirty(false);
       removeListener();
     });
