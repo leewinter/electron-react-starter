@@ -44,8 +44,8 @@ export type SqlColumn = {
 };
 
 export type SqlExecutionResponsePayload = {
-  recordset: Array<Array<unknown>>;
-  columns: SqlColumn[];
+  recordsets: Array<Array<unknown[]>>;
+  columnSets: Array<SqlColumn[]>;
   error: string | null;
 };
 
