@@ -15,6 +15,7 @@ import {
   SqlExecutionResponsePayload,
 } from '../../../../shared/types/data-channel.d';
 import { useEffect, useMemo, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid'
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ReportGrid from '../results/sql-result-grid';
@@ -36,7 +37,7 @@ export default function SqlQueryComponent({ initialState, onStateChange }): JSX.
     initialState.isResultsExpanded ?? false,
   );
 
-  const { connections } = useSqlConnections();
+  const { connections, setConnections } = useSqlConnections();
   const { sendMessage, onMessage, removeListener } = useEventChannel({
     channel: DataChannel.SQL_EXECUTE,
   });
@@ -78,6 +79,25 @@ export default function SqlQueryComponent({ initialState, onStateChange }): JSX.
       // Expand results, collapse editor
       setIsEditorExpanded(false);
       setIsResultsExpanded(true);
+
+      // Update connection history
+      const updatedConnections = connections.map((n) =>
+        n.connectionId === selectedConnection?.connectionId
+          ? {
+            ...n,
+            queryHistory: [
+              ...(n.queryHistory || []),
+              {
+                queryHistoryItemId: uuidv4(),
+                sql: code,
+                date: new Date(),
+                rowCountResult: response.payload.recordsets[0].length,
+              },
+            ],
+          }
+          : n,
+      );
+      setConnections(updatedConnections);
     });
   };
 
